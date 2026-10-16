@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VAT Desk — UAE VAT consultancy workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F1; --surface:#FFFFFF; --surface-2:#F6F8F7; --ink:#172026; --ink-2:#4A5A60; --ink-3:#74838A;
+  --line:#D3DCDA; --brand:#0F6B5C; --brand-ink:#FFFFFF; --brand-soft:#DCEFEA;
+  --stamp:#7A4E0E; --stamp-bg:#FBF1DC; --stamp-line:#E3C58C;
+  --high:#B42318; --high-bg:#FDECEA; --med:#A15C07; --med-bg:#FEF4E6; --low:#245F9E; --low-bg:#E8F1FB; --ok:#1C7C4A; --ok-bg:#E6F4EC;
+  --focus:#2563EB; --shadow:0 1px 2px rgba(23,32,38,.06),0 4px 14px rgba(23,32,38,.05);
+  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --serif:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0E1517; --surface:#152023; --surface-2:#1A272B; --ink:#E6EEEC; --ink-2:#AFC0BD; --ink-3:#83958F;
+  --line:#2A3A3E; --brand:#3FB39C; --brand-ink:#06201B; --brand-soft:#173A33;
+  --stamp:#F0C77E; --stamp-bg:#2D2414; --stamp-line:#5C4722;
+  --high:#FF8A7E; --high-bg:#3A1A17; --med:#F2B45C; --med-bg:#35270F; --low:#8DB8F0; --low-bg:#162940; --ok:#6FD39E; --ok-bg:#12301F;
+  --focus:#7AA7FF; --shadow:none; color-scheme:dark; }}
+:root[data-theme="dark"]{
+  --bg:#0E1517; --surface:#152023; --surface-2:#1A272B; --ink:#E6EEEC; --ink-2:#AFC0BD; --ink-3:#83958F;
+  --line:#2A3A3E; --brand:#3FB39C; --brand-ink:#06201B; --brand-soft:#173A33;
+  --stamp:#F0C77E; --stamp-bg:#2D2414; --stamp-line:#5C4722;
+  --high:#FF8A7E; --high-bg:#3A1A17; --med:#F2B45C; --med-bg:#35270F; --low:#8DB8F0; --low-bg:#162940; --ok:#6FD39E; --ok-bg:#12301F;
+  --focus:#7AA7FF; --shadow:none; color-scheme:dark; }
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.app{display:grid;grid-template-columns:252px minmax(0,1fr);height:100%}
+/* rail */
+.rail{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.brand{padding:20px 20px 14px;display:flex;align-items:center;gap:10px}
+.brand-mark{width:30px;height:30px;border-radius:7px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font:600 13px var(--serif)}
+.brand h1{font:600 17px/1.1 var(--serif);margin:0}
+.brand small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.client-box{margin:4px 14px 14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.client-box label{font-size:12px;color:var(--ink-3);display:block;margin-bottom:4px}
+.client-box select{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:7px;padding:7px 8px}
+.nav{display:flex;flex-direction:column;padding:4px 10px;gap:2px;overflow:auto}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--ink-2);font-weight:500}
+.nav button svg{width:18px;height:18px;flex:none}
+.nav button:hover{background:var(--surface-2);color:var(--ink)}
+.nav button[aria-current="page"]{background:var(--brand-soft);color:var(--brand)}
+.nav button:focus-visible{outline:2px solid var(--focus)}
+.rail-foot{margin-top:auto;padding:14px 18px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-3);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ink-3);margin-right:6px;vertical-align:1px}
+.status-dot.on{background:var(--ok)}
+/* main */
+.main{min-width:0;min-height:0;overflow:auto}
+.view{display:none;max-width:1080px;margin:0 auto;padding:28px 32px 64px}
+.view.active{display:block}
+.view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.view-head h2{font:600 26px/1.2 var(--serif);margin:0}
+.view-head p{margin:4px 0 0;color:var(--ink-2);max-width:62ch}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ink-2)}
+.btn.small{padding:5px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn svg{width:16px;height:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.muted{color:var(--ink-3)}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:13px;color:var(--ink-2);font-weight:500}
+.field input,.field select,.field textarea{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;width:100%}
+.field textarea{min-height:80px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.notice{border:1px solid var(--stamp-line);background:var(--stamp-bg);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:14px}
+.notice b{color:var(--stamp)}
+.hidden{display:none!important}
+/* citation chip — the signature element */
+.cite{all:unset;cursor:pointer;display:inline-block;font:500 12.5px/1.3 var(--sans);color:var(--stamp);background:var(--stamp-bg);border:1px solid var(--stamp-line);border-radius:4px;padding:1px 6px;margin:0 1px;white-space:nowrap;letter-spacing:.01em}
+.cite:hover{border-color:var(--stamp)}
+.cite:focus-visible{outline:2px solid var(--focus)}
+/* ask */
+.chat{display:flex;flex-direction:column;gap:18px;margin-bottom:18px}
+.msg-user{align-self:flex-end;max-width:78%;background:var(--brand-soft);border-radius:12px 12px 4px 12px;padding:10px 14px;white-space:pre-wrap}
+.msg-ai{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 20px;box-shadow:var(--shadow)}
+.msg-ai .tools{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);flex-wrap:wrap}
+.md{max-width:76ch}
+.md h3,.md h4{font:600 16px/1.3 var(--serif);margin:16px 0 6px}
+.md p{margin:0 0 10px}
+.md ul,.md ol{margin:0 0 10px;padding-left:22px}
+.md li{margin:3px 0}
+.md table{border-collapse:collapse;margin:8px 0 12px;font-size:14px;display:block;overflow-x:auto;max-width:100%}
+.md th,.md td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+.md th{background:var(--surface-2)}
+.md code{background:var(--surface-2);padding:1px 5px;border-radius:4px;font-size:13px}
+.composer{position:sticky;bottom:0;background:linear-gradient(to bottom,transparent,var(--bg) 22%);padding-top:14px}
+.composer-box{display:flex;gap:10px;align-items:flex-end;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow)}
+.composer-box textarea{flex:1;border:0;background:transparent;resize:none;min-height:44px;max-height:200px;outline:none;padding:6px}
+.starter{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.starter button{all:unset;cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--ink-2)}
+.starter button:hover{border-color:var(--brand);color:var(--ink)}
+.starter button:focus-visible{outline:2px solid var(--focus)}
+.thinking{color:var(--ink-3);font-style:italic}
+/* review */
+.drop{border:1.5px dashed var(--ink-3);border-radius:12px;padding:28px;text-align:center;background:var(--surface);cursor:pointer}
+.drop.over{border-color:var(--brand);background:var(--brand-soft)}
+.drop strong{display:block;font:600 17px var(--serif);margin-bottom:4px}
+.types{font-size:13px;color:var(--ink-3);margin-top:6px}
+.queue{margin-top:16px}
+.qrow{display:grid;grid-template-columns:minmax(0,1fr) 150px 110px 32px;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.qrow:last-child{border-bottom:0}
+.qrow .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.qrow select{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 6px;font-size:13px;width:100%}
+.pill{display:inline-block;font-size:12px;font-weight:500;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2)}
+.pill.run{background:var(--low-bg);color:var(--low)}
+.pill.done{background:var(--ok-bg);color:var(--ok)}
+.pill.err{background:var(--high-bg);color:var(--high)}
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.ledger{margin-top:24px}
+.rev{border-bottom:1px solid var(--line);padding:16px 18px}
+.rev:last-child{border-bottom:0}
+.rev-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;cursor:pointer}
+.rev-head h4{margin:0;font:600 15.5px/1.35 var(--sans)}
+.rev-meta{font-size:13px;color:var(--ink-3);margin-top:2px}
+.sevs{display:flex;gap:4px;flex:none}
+.sev{font-size:12px;font-weight:600;padding:2px 7px;border-radius:5px}
+.sev.high{background:var(--high-bg);color:var(--high)}
+.sev.medium{background:var(--med-bg);color:var(--med)}
+.sev.low{background:var(--low-bg);color:var(--low)}
+.sev.info{background:var(--surface-2);color:var(--ink-2)}
+.rev-body{margin-top:12px;display:none}
+.rev.open .rev-body{display:block}
+.finding{display:grid;grid-template-columns:4px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.finding .bar{border-radius:2px}
+.finding .bar.high{background:var(--high)} .finding .bar.medium{background:var(--med)} .finding .bar.low{background:var(--low)} .finding .bar.info{background:var(--line)}
+.finding p{margin:2px 0}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 16px;font-size:13.5px;margin:6px 0 10px}
+.kv div span{display:block;color:var(--ink-3);font-size:12px}
+.checks{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chk{font-size:12px;padding:2px 8px;border-radius:5px;border:1px solid var(--line)}
+.chk.pass{color:var(--ok);border-color:var(--ok)} .chk.fail{color:var(--high);border-color:var(--high)} .chk.unclear{color:var(--med);border-color:var(--med)}
+/* library */
+.lib-layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:20px}
+.lib-groups{display:flex;flex-direction:column;gap:2px;position:sticky;top:12px;align-self:start}
+.lib-groups button{all:unset;cursor:pointer;padding:7px 10px;border-radius:7px;font-size:14px;color:var(--ink-2)}
+.lib-groups button[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand);font-weight:500}
+.lib-groups button:focus-visible{outline:2px solid var(--focus)}
+.lib-search{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:9px 12px;margin-bottom:14px}
+.entry{padding:18px 20px;border-bottom:1px solid var(--line)}
+.entry:last-child{border-bottom:0}
+.entry h4{margin:0 0 2px;font:600 17px/1.3 var(--serif)}
+.entry .ref{font-size:13px;color:var(--ink-3)}
+.entry p{margin:8px 0;max-width:72ch}
+.entry ul{margin:6px 0 10px;padding-left:20px;max-width:72ch}
+.entry li{margin:3px 0}
+.entry .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:12px;padding:1px 7px;border-radius:4px;margin-left:6px;vertical-align:2px;font-weight:500}
+.tag.verify{background:var(--med-bg);color:var(--med)}
+.tag.new{background:var(--ok-bg);color:var(--ok)}
+.entry.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{background:var(--stamp-bg)}100%{background:transparent}}
+table.idx{width:100%;border-collapse:collapse;font-size:14px}
+table.idx th,table.idx td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+table.idx th{font-weight:600;color:var(--ink-2);background:var(--surface-2)}
+.scroll-x{overflow-x:auto}
+/* tools */
+.tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tool{padding:18px 20px}
+.tool h3{margin:0 0 4px;font:600 17px var(--serif)}
+.tool > p{margin:0 0 14px;color:var(--ink-2);font-size:14px}
+.result{margin-top:10px;padding:12px 14px;border-radius:9px;background:var(--surface-2);font-size:14px}
+.result .big{font:600 22px var(--serif)}
+/* reports */
+.rep-layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start}
+.pick{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.pick label{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-bottom:1px solid var(--line);font-size:13.5px;cursor:pointer}
+.pick label:last-child{border-bottom:0}
+.paper{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:40px 46px;box-shadow:var(--shadow);min-height:420px}
+.paper h1{font:600 24px/1.25 var(--serif);margin:0 0 4px}
+.paper h2{font:600 17px var(--serif);margin:22px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.paper .meta{color:var(--ink-3);font-size:13px;margin-bottom:18px}
+.paper table{width:100%;border-collapse:collapse;font-size:13px}
+.paper th,.paper td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.paper th{background:var(--surface-2)}
+.empty{text-align:center;padding:48px 20px;color:var(--ink-3)}
+.empty strong{display:block;color:var(--ink);font:600 17px var(--serif);margin-bottom:4px}
+/* clients */
+.client-row{display:grid;grid-template-columns:minmax(0,1.4fr) 1fr 1fr auto;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:center}
+.client-row:last-child{border-bottom:0}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:22px;width:min(560px,94vw)}
+dialog::backdrop{background:rgba(10,20,22,.45)}
+dialog h3{margin:0 0 14px;font:600 19px var(--serif)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:9px;font-size:14px;z-index:50;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+.mobile-bar{display:none}
+.grounded{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.law-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);align-items:center}
+.law-row:last-child{border-bottom:0}
+.law-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.art-list{display:flex;flex-direction:column;max-height:70vh;overflow:auto}
+.art-item{all:unset;cursor:pointer;display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;padding:9px 20px;border-bottom:1px solid var(--line);font-size:14px}
+.art-item span{color:var(--stamp);font-weight:500}
+.art-item:hover{background:var(--surface-2)}
+.art-item:focus-visible{outline:2px solid var(--focus)}
+#artDlg{width:min(840px,96vw)}
+#artText{white-space:pre-wrap;font:15px/1.65 var(--serif);max-height:60vh;overflow:auto;padding:14px 18px;background:var(--surface-2);border-radius:8px;margin:12px 0}
+.signed{font-size:12px;color:var(--ok);font-weight:500;margin-left:6px}
+@media (max-width:860px){
+  .law-row{grid-template-columns:1fr} .law-acts{justify-content:flex-start}
+  .app{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto}
+  .rail{display:contents}
+  .brand,.rail-foot{display:none}
+  .client-box{grid-row:1;margin:0;border-radius:0;border:0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface)}
+  .client-box label{margin:0;white-space:nowrap}
+  .nav{grid-row:3;flex-direction:row;justify-content:space-around;background:var(--surface);border-top:1px solid var(--line);padding:4px 2px;overflow-x:auto}
+  .nav button{flex-direction:column;gap:2px;font-size:11px;padding:6px 8px}
+  .main{grid-row:2}
+  .view{padding:20px 16px 48px}
+  .grid2,.tool-grid,.starter,.lib-layout,.rep-layout{grid-template-columns:1fr}
+  .lib-groups{position:static;flex-direction:row;overflow-x:auto;gap:4px}
+  .lib-groups button{white-space:nowrap}
+  .qrow{grid-template-columns:minmax(0,1fr) 110px 32px}
+  .qrow .qstatus{display:none}
+  .client-row{grid-template-columns:1fr auto}
+  .client-row .hide-sm{display:none}
+  .paper{padding:24px 20px}
+  .msg-user{max-width:92%}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script type="application/json" id="lawpack"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <div class="brand"><div class="brand-mark">VD</div><div><h1>VAT Desk</h1><small>UAE VAT consultancy workbench</small></div></div>
+    <div class="client-box">
+      <label for="clientSel">Working on</label>
+      <select id="clientSel" aria-label="Active client"></select>
+    </div>
+    <nav class="nav" aria-label="Sections">
+      <button data-view="ask" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H9l-5 4z"/></svg>Ask</button>
+      <button data-view="review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Review</button>
+      <button data-view="reports"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 20V10M11 20V4M17 20v-7"/></svg>Reports</button>
+      <button data-view="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h6v16H4zM10 4h4v16h-4zM15 5l4-1 2 16-4 1z"/></svg>Library</button>
+      <button data-view="tools"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M8 16h2M12 16h4"/></svg>Calculators</button>
+      <button data-view="clients"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 4a3.5 3.5 0 010 7M21 20c0-2.8-1.9-5.2-4.5-5.8"/></svg>Clients</button>
+    </nav>
+    <div class="rail-foot"><span id="aiStatus"><span class="status-dot"></span>Connecting…</span><span><button class="btn ghost small hidden" id="keyBtn">API key</button><button class="btn ghost small" id="themeBtn" aria-label="Toggle colour theme">Theme</button></span></div>
+  </aside>
+
+  <main class="main" id="main">
+    <!-- ASK -->
+    <section class="view active" id="view-ask" aria-labelledby="askTitle">
+      <div class="view-head"><div><h2 id="askTitle">Ask a VAT question</h2><p>Answers cite the VAT Law, Executive Regulations, amendments and FTA guidance. Tap any citation to open it in the Library.</p></div>
+        <button class="btn small" id="newChat">New conversation</button></div>
+      <div class="notice hidden" id="keyNote" style="margin-bottom:16px"><b>Standalone mode.</b> This copy is running outside Claude, so Ask, Review and Reports need your own Anthropic API key. Library and Calculators work without it. <button class="btn small" id="keyBtn2" style="margin-left:6px">Add API key</button></div>
+      <p class="muted" id="lawCoverage" style="font-size:13.5px;margin:-6px 0 16px"></p>
+      <div class="starter" id="starter">
+        <button data-q="A developer sells a residential villa 2.5 years after the completion certificate, and leases another unit after 4 years. What's the VAT treatment and input tax position for each?">Residential first supply vs later lease</button>
+        <button data-q="We pay a non-resident consultant in the UK for software implementation. How do we account for reverse charge from 2026, and what records do we keep instead of a self-invoice?">Reverse charge after the 2026 amendments</button>
+        <button data-q="Which input VAT is blocked on staff entertainment, client dinners and company cars? Give the conditions and examples.">Blocked input tax: entertainment and cars</button>
+        <button data-q="Payable VAT of AED 120,000 was due on 28 May 2026 and paid on 10 August 2026. What penalty applies under the current framework?">Late payment penalty under CD 129/2025</button>
+      </div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <div class="composer">
+        <div class="composer-box">
+          <textarea id="askInput" rows="2" placeholder="Ask about any UAE VAT matter — supply, rate, recovery, real estate, penalties, IFRS impact…" aria-label="Your question"></textarea>
+          <button class="btn primary" id="askBtn">Ask</button>
+          <button class="btn hidden" id="stopAsk">Stop</button>
+        </div>
+        <p class="muted" style="font-size:12px;margin:8px 2px 0">Decision support, not a tax ruling. Confirm material positions with the FTA text or a registered tax agent.</p>
+      </div>
+    </section>
+
+    <!-- REVIEW -->
+    <section class="view" id="view-review" aria-labelledby="revTitle">
+      <div class="view-head"><div><h2 id="revTitle">Review documents</h2><p>Upload any mix of invoices, bills, contracts, SPAs, leases, SAP GL or VAT ledger extracts and return workings. Each file is read and checked against UAE VAT rules.</p></div></div>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose files to review">
+        <strong>Drop files here or choose files</strong>
+        <span class="muted">Bulk upload supported — files are reviewed one after another.</span>
+        <div class="types">PDF (incl. scanned) · Word · Excel · CSV · images · PowerPoint · email (.eml) · text, JSON, XML, HTML</div>
+        <input type="file" id="fileIn" multiple hidden>
+      </div>
+      <div class="panel queue hidden" id="queuePanel"></div>
+      <div class="toolbar hidden" id="queueBar">
+        <button class="btn primary" id="runReview">Review all</button>
+        <label style="display:flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" id="deep"> Deep review (slower, more thorough)</label>
+        <button class="btn hidden" id="stopReview">Stop</button>
+        <button class="btn ghost" id="clearQueue">Clear list</button>
+        <span class="muted" id="queueNote" style="font-size:13px"></span>
+      </div>
+      <div class="ledger">
+        <div class="view-head" style="margin-bottom:10px"><div><h2 style="font-size:20px">Findings ledger</h2><p id="ledgerSub">Reviewed documents for the active client.</p></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><select id="sevFilter" class="btn small" aria-label="Filter by severity"><option value="">All severities</option><option value="high">High only</option><option value="medium">Medium and up</option></select></div></div>
+        <div class="panel" id="ledger"></div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="view" id="view-reports" aria-labelledby="repTitle">
+      <div class="view-head"><div><h2 id="repTitle">Reports</h2><p>Turn reviewed documents and saved advice into a client report. Download as PDF, Word or Excel.</p></div></div>
+      <div class="rep-layout">
+        <div class="panel" style="padding:18px">
+          <div class="field"><label for="repType">Report type</label>
+            <select id="repType"><option value="findings">VAT review findings report</option><option value="memo">VAT advisory memo</option><option value="health">VAT health check</option><option value="return">VAT return review (Form 201)</option></select></div>
+          <div class="field"><label for="repPeriod">Period or scope</label><input id="repPeriod" placeholder="e.g. Q2 2026 (Apr–Jun)"></div>
+          <div class="field"><label for="repFocus">Anything to emphasise</label><textarea id="repFocus" placeholder="Optional — e.g. focus on input tax recovery on project costs"></textarea></div>
+          <div class="field"><label>Include</label><div class="pick" id="repPick"></div></div>
+          <button class="btn primary" id="genReport" style="width:100%;justify-content:center">Generate report</button>
+          <button class="btn hidden" id="stopReport" style="width:100%;justify-content:center;margin-top:8px">Stop</button>
+          <div class="toolbar" id="exportBar" style="justify-content:stretch">
+            <button class="btn" data-exp="pdf" disabled>PDF</button><button class="btn" data-exp="docx" disabled>Word</button><button class="btn" data-exp="xlsx" disabled>Excel</button>
+          </div>
+        </div>
+        <div class="paper" id="paper"><div class="empty"><strong>No report yet</strong>Pick the documents to include, then generate.</div></div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section class="view" id="view-library" aria-labelledby="libTitle">
+      <div class="view-head"><div><h2 id="libTitle">Source library</h2><p>Laws, regulations, amendments, FTA guidance, penalties and IFRS alignment — summarised, dated, and linked to the official text.</p></div></div>
+      <div class="lib-layout">
+        <div class="lib-groups" id="libGroups" role="group" aria-label="Library sections"></div>
+        <div><input class="lib-search" id="libSearch" type="search" placeholder="Search the library — e.g. bare land, Art 54, serviced apartments" aria-label="Search the library">
+          <div class="panel" id="libList"></div></div>
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="view" id="view-tools" aria-labelledby="toolTitle">
+      <div class="view-head"><div><h2 id="toolTitle">Calculators</h2><p>Deterministic checks that run in your browser — no AI involved, so the numbers are repeatable.</p></div></div>
+      <div class="tool-grid">
+        <div class="panel tool" id="t-re">
+          <h3>Real estate VAT classifier</h3><p>Rate and input tax position for a property supply.</p>
+          <div class="grid2">
+            <div class="field"><label for="reType">Property</label><select id="reType"><option value="res">Residential building</option><option value="serv">Serviced / hotel apartment</option><option value="com">Commercial building</option><option value="land">Bare land</option><option value="charity">Building for charitable use</option><option value="mixed">Mixed-use</option></select></div>
+            <div class="field"><label for="reTx">Transaction</label><select id="reTx"><option value="sale">Sale</option><option value="lease">Lease</option></select></div>
+          </div>
+          <div class="field" id="reFirstWrap"><label for="reFirst">Is this the first supply within 3 years of completion?</label><select id="reFirst"><option value="yes">Yes — first supply, within 3 years</option><option value="no">No — later supply or after 3 years</option></select></div>
+          <div class="result" id="reOut"></div>
+        </div>
+        <div class="panel tool">
+          <h3>Input tax apportionment</h3><p>Standard method recovery for residual (overhead) input tax.</p>
+          <div class="grid2">
+            <div class="field"><label for="apTax">Taxable supplies (5% + 0%), AED</label><input id="apTax" inputmode="decimal" placeholder="0"></div>
+            <div class="field"><label for="apEx">Exempt supplies, AED</label><input id="apEx" inputmode="decimal" placeholder="0"></div>
+          </div>
+          <div class="field"><label for="apRes">Residual input VAT, AED</label><input id="apRes" inputmode="decimal" placeholder="0"></div>
+          <div class="result" id="apOut"></div>
+        </div>
+        <div class="panel tool">
+          <h3>Capital Assets Scheme adjustment</h3><p>Annual adjustment when use of a capital asset changes.</p>
+          <div class="grid2">
+            <div class="field"><label for="caKind">Asset</label><select id="caKind"><option value="10">Building / real estate (10 years)</option><option value="5">Other capital asset (5 years)</option></select></div>
+            <div class="field"><label for="caVal">Asset value excl. VAT, AED</label><input id="caVal" inputmode="decimal" placeholder="5,000,000"></div>
+            <div class="field"><label for="caTax">Total input tax on the asset, AED</label><input id="caTax" inputmode="decimal"></div>
+            <div class="field"><label for="caInit">Recovery % in year of acquisition</label><input id="caInit" inputmode="decimal" placeholder="100"></div>
+            <div class="field"><label for="caNow">Taxable use % this year</label><input id="caNow" inputmode="decimal" placeholder="60"></div>
+          </div>
+          <div class="result" id="caOut"></div>
+        </div>
+        <div class="panel tool">
+          <h3>Late payment penalty</h3><p>Estimate under Cabinet Decision 129 of 2025 (from 14 April 2026).</p>
+          <div class="field"><label for="lpAmt">Unpaid payable tax, AED</label><input id="lpAmt" inputmode="decimal"></div>
+          <div class="grid2">
+            <div class="field"><label for="lpDue">Due date</label><input id="lpDue" type="date"></div>
+            <div class="field"><label for="lpPaid">Payment date</label><input id="lpPaid" type="date"></div>
+          </div>
+          <div class="result" id="lpOut"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CLIENTS -->
+    <section class="view" id="view-clients" aria-labelledby="cliTitle">
+      <div class="view-head"><div><h2 id="cliTitle">Clients</h2><p>Client profiles give every answer and review the right context — sector, free zone, tax period, supply mix.</p></div>
+        <button class="btn primary" id="addClient">Add client</button></div>
+      <div class="panel" id="clientList"></div>
+      <p class="muted" style="font-size:13px;margin-top:12px" id="storeNote"></p>
+      <div class="field" style="max-width:340px;margin-top:18px"><label for="reviewer">Your name for review sign-off</label><input id="reviewer" placeholder="e.g. J. Perera"></div>
+    </section>
+  </main>
+</div>
+
+<dialog id="clientDlg">
+  <form method="dialog" id="clientForm">
+    <h3 id="clientDlgTitle">Add client</h3>
+    <div class="field"><label for="cName">Client name</label><input id="cName" required></div>
+    <div class="grid2">
+      <div class="field"><label for="cTrn">TRN</label><input id="cTrn" inputmode="numeric" placeholder="15 digits"></div>
+      <div class="field"><label for="cPeriod">Tax period</label><select id="cPeriod"><option>Quarterly</option><option>Monthly</option><option>Other</option></select></div>
+      <div class="field"><label for="cSector">Sector</label><select id="cSector"><option>Real estate development</option><option>Real estate leasing</option><option>Construction / contracting</option><option>Trading</option><option>Professional services</option><option>Hospitality</option><option>Financial services</option><option>Manufacturing</option><option>Healthcare / education</option><option>Other</option></select></div>
+      <div class="field"><label for="cZone">Location</label><select id="cZone"><option>Mainland</option><option>Designated zone (e.g. JAFZA)</option><option>Non-designated free zone</option><option>Multiple</option></select></div>
+    </div>
+    <div class="field"><label for="cNotes">Supply mix and notes</label><textarea id="cNotes" placeholder="e.g. Sells off-plan residential units and leases commercial units; part of a tax group"></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;margin-top:6px">
+      <button type="button" class="btn ghost" id="delClient" style="color:var(--high)">Delete client</button>
+      <span style="display:flex;gap:8px"><button type="button" class="btn" id="cancelClient">Cancel</button><button type="submit" class="btn primary" id="saveClient">Save client</button></span>
+    </div>
+  </form>
+</dialog>
+<dialog id="impDlg"><form id="impForm"><h3>Import legislation</h3>
+  <p class="muted" style="margin-top:0;font-size:14px">Use the official PDF from the FTA or Ministry of Finance. Text-based PDFs split cleanly into articles; scanned PDFs can't be read.</p>
+  <div class="field"><label for="impLaw">This file is</label><select id="impLaw"></select></div>
+  <div class="grid2 hidden" id="impOther"><div class="field"><label for="impCode">Short code</label><input id="impCode" placeholder="e.g. RE Guide"></div><div class="field"><label for="impTitle">Title</label><input id="impTitle" placeholder="e.g. FTA Real Estate VAT Guide"></div></div>
+  <div class="field"><label for="impFile">File</label><input id="impFile" type="file" accept=".pdf,.docx,.txt,.htm,.html"></div>
+  <p id="impStatus" class="muted" style="font-size:13.5px" role="status"></p>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" class="btn" id="impCancel">Cancel</button><button type="submit" class="btn primary" id="impGo">Import</button></div></form></dialog>
+<dialog id="artDlg"><h3 id="artTitle"></h3><p class="muted" id="artSrc" style="font-size:12.5px;margin:0"></p><div id="artText" tabindex="0"></div>
+  <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap"><span style="display:flex;gap:6px"><button class="btn small" id="artPrev">Previous article</button><button class="btn small" id="artNext">Next article</button></span><span style="display:flex;gap:6px"><button class="btn small" id="artCopy">Copy</button><button class="btn small primary" id="artAsk">Ask about this article</button><button class="btn small" id="artClose">Close</button></span></div></dialog>
+<input type="file" id="packFile" accept=".json" hidden>
+<dialog id="keyDlg">
+  <form method="dialog" id="keyForm">
+    <h3>Anthropic API key</h3>
+    <p class="muted" style="margin-top:0;font-size:14px">Used only when VAT Desk runs outside Claude. The key is stored in this browser only and sent only to api.anthropic.com. Don't share a computer profile that holds your key.</p>
+    <div class="field"><label for="keyIn">API key</label><input id="keyIn" type="password" autocomplete="off" placeholder="sk-ant-…"></div>
+    <div style="display:flex;gap:8px;justify-content:space-between"><button type="button" class="btn ghost" id="keyClear" style="color:var(--high)">Remove key</button><span style="display:flex;gap:8px"><button type="button" class="btn" id="keyCancel">Cancel</button><button type="submit" class="btn primary">Save key</button></span></div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+<script>
+"use strict";
+/* ============ Knowledge base used in every AI call (verified Oct 2026; flagged items need checking) ============ */
+const KB = `UAE VAT KNOWLEDGE BASE (curated, as at October 2026)
+CORE LAW
+- Federal Decree-Law (FDL) No. 8 of 2017 on VAT, in force 1 Jan 2018. Standard rate 5%.
+- Executive Regulation (ER): Cabinet Decision No. 52 of 2017, amended by Cabinet Decision No. 100 of 2024 (in force 15 Nov 2024; FTA guidance in Public Clarification VATP040, Mar 2025).
+- Amending laws: FDL 18 of 2022 (from 1 Jan 2023); FDL 16 of 2024 (from 30 Oct 2024); FDL 16 of 2025 (from 1 Jan 2026). FTA published a public clarification on the 2024 and 2025 amendments in Sep 2026.
+- TPL Executive Regulation: Cabinet Decision 74 of 2023, amended from 1 Apr 2026 (refund/credit balance procedures, voluntary disclosures, record retention).
+- Tax Procedures Law (TPL): FDL 28 of 2022 (from 1 Mar 2023, replaced FDL 7 of 2017), amended extensively by FDL 17 of 2025 (from 1 Jan 2026) incl. refunds, limitation periods and FTA powers. Audits, assessments, voluntary disclosures, reconsideration and objections sit in the TPL.
+- Penalties: Cabinet Decision 40 of 2017 as amended by CD 49 of 2021 and CD 129 of 2025 (in force 14 Apr 2026).
+- E-invoicing: Ministerial Decisions 243 and 244 of 2025.
+2026 CHANGES (FDL 16/2025)
+- No self-invoice needed when applying reverse charge; keep the supporting documents the ER specifies.
+- 5-year limit to request refund of excess recoverable tax; transitional window to 31 Dec 2026 where the 5 years lapsed or lapse within a year of 1 Jan 2026.
+- FTA may deny input tax where the supply is part of a tax-evasion arrangement and the recipient knew or should have known (new clauses in FDL Art 54).
+- FDL Art 79 bis (limitation) repealed; limitation now follows the amended TPL.
+REGISTRATION: mandatory FDL Art 13 when taxable supplies + imports exceed AED 375,000 in 12 months (or expected within 30 days); voluntary FDL Art 17 at AED 187,500 (supplies or taxable expenses). Tax groups FDL Art 14.
+DATE / PLACE OF SUPPLY: Date of supply FDL Art 25 = earliest of transfer of goods / completion of service, receipt of payment, issue of tax invoice; special cases (continuous/periodic supplies) Art 26. Place of supply goods Art 27; services general Art 29; special cases Art 30 (real estate: where the property is located).
+ZERO-RATED (FDL Art 45): exports of goods and services outside the GCC implementing states (subject to ER conditions, tightened by CD 100/2024 for services benefiting a person in the UAE), international transport, certain means of transport, investment precious metals, first supply of residential buildings by sale or lease within 3 years of completion, first supply of buildings for charity, conversion of non-residential to residential, specified healthcare and education, crude oil and natural gas.
+EXEMPT (FDL Art 46): specified financial services (margin-based; explicit fees are taxable), residential buildings other than zero-rated supplies (sale or lease), bare land, local passenger transport.
+OUT OF SCOPE examples: qualifying goods supplies within/between Designated Zones (FDL Art 51, conditions apply); services in a Designated Zone are taxed normally. Check the Designated Zone list (JAFZA is listed in the FTA designated zones list — confirm the specific area).
+REVERSE CHARGE: imports of services/goods by a registrant (FDL Art 48); domestic reverse charge on specified gold/diamonds, hydrocarbons, electronic devices (separate Cabinet/Ministerial decisions). Reverse-charge imports are outside the e-invoicing scope.
+INPUT TAX: recoverable input tax FDL Art 54 (plus 2026 anti-evasion clauses). Conditions FDL Art 55: hold a valid tax invoice (or alternative evidence where allowed) and pay or intend to pay within 6 months after the agreed payment date; otherwise reverse the input tax. Blocked input tax ER Art 53: entertainment services for non-employees and most staff entertainment, motor vehicles available for personal use, goods/services provided to employees for personal use with no business obligation. Apportionment ER Art 55 (standard method = taxable supplies / total supplies, with annual adjustment; special method needs FTA approval). Input tax on costs used for exempt supplies is not recoverable.
+CAPITAL ASSETS SCHEME (ER): capital assets of AED 5,000,000 or more (excl. VAT); adjustment period 10 years for buildings, 5 years for other assets. Annual adjustment = (total input tax / adjustment period) x (recovery % at acquisition - taxable use % this year). Positive = pay back; negative = extra recovery. CD 100/2024 revised CAS and apportionment details (see VATP040).
+REAL ESTATE: commercial sale/lease 5%; residential first supply within 3 years of completion 0% (developer recovers input tax); later residential supplies exempt (no recovery); bare land exempt; serviced/hotel apartments with additional services are not "residential" -> 5%; mixed-use split on a fair basis. Records for real estate must be kept longer than the general 5 years (15 years under the 2017 rules — confirm current TPL position after FDL 17/2025).
+INVOICES: tax invoice FDL Art 65, issue within 14 days of the date of supply; contents ER Art 59 (the words "Tax Invoice"; supplier name, address, TRN; recipient name, address, TRN if registered; sequential number; date of issue; date of supply if different; description; quantity/unit price; rate and VAT amount; discounts; total payable; VAT in AED with exchange rate if foreign currency; "reverse charge" note where relevant). Simplified tax invoice allowed where recipient is unregistered or supply value does not exceed AED 10,000. Tax credit notes FDL Art 70 / ER Art 60. CD 100/2024 also relaxed some invoice rules (e.g. electronic issue).
+BAD DEBT RELIEF: FDL Art 64 (conditions: written off, 6 months past due, notice to customer).
+PENALTIES (CD 129/2025, from 14 Apr 2026): late payment = 14% per annum, calculated monthly (approx. 1.1667% per month or part) on unpaid tax from the day after the due date, non-compounding — replaces 2% + 4% monthly (300% cap) under CD 49/2021. Voluntary disclosure of a tax difference moved to a monthly 1%-per-month basis; FTA-detected differences carry an additional fixed percentage. Fixed amounts for late registration, late filing, invoice and record-keeping failures were revised — always state "verify the exact amount in the CD 129/2025 schedule" for these.
+E-INVOICING (MD 243/244 of 2025): pilot from 1 Jul 2026 (voluntary adoption allowed); revenue >= AED 50m: appoint an Accredited Service Provider (deadline reported extended from 31 Jul 2026 to 30 Oct 2026 — verify) and go live 1 Jan 2027; revenue < AED 50m: ASP by 31 Mar 2027, go live 1 Jul 2027; government entities later (reported 1 Oct 2027). Peppol PINT-AE format; B2C outside scope unless decided; e-invoice records stored in the UAE.
+IFRS LINKS: IFRS 15 control-based revenue vs VAT date of supply (advances and invoices trigger VAT earlier). IFRS 16 rent invoices/payments trigger VAT per period. IAS 16 / IAS 2: non-recoverable VAT is part of the cost of the asset or inventory; recoverable VAT is a receivable. IAS 21 and VAT rules: VAT must be stated in AED using UAE Central Bank rates. IAS 37: provide for probable penalties/assessments; IFRIC 23 applies to income taxes, not VAT.
+FTA GUIDANCE: FTA publishes Public Clarifications (VATP series) and guides (real estate, input tax apportionment, tax invoices, designated zones, tax groups, capital assets). Only cite a VATP number if certain (VATP040 = CD 100/2024 amendments); otherwise say "see the relevant FTA guide".`;
+
+const ANSWER_RULES = `You are VAT Desk, a senior UAE VAT advisor assisting a CMA/CPA finance professional who runs a VAT consultancy.
+Use the knowledge base below plus your own expertise. Rules:
+1. Lead with a direct answer ("Bottom line"), then the reasoning.
+2. Cite authority in this exact short form so the app can link it: "FDL Art 45(9)", "ER Art 53", "TPL Art 10", "CD 129/2025", "MD 244/2025", "VATP040", "IFRS 15", "IAS 16". Only cite article numbers you are confident about; otherwise name the topic and add it to Verify.
+3. Show calculations step by step in AED when numbers are involved.
+4. Distinguish clearly what has changed in 2024-2026 and the effective dates.
+5. Never invent FTA clarification numbers, rates, thresholds or penalty amounts.
+6. End with two short lines: "Confidence: High/Medium/Low — why" and "Verify: …" (official checks or facts to confirm with the client).
+7. Answer in the language the user writes in. If they mix Sinhala and English (Singlish), reply in the same casual mix, but keep legal terms, article references and numbers in English.
+8. Use Markdown: short paragraphs, bullet lists, tables where they help. No preamble.`;
+
+/* ============ Library ============ */
+const LINKS = {
+  vatLaw:{t:"VAT Law (UAE Legislation portal)",u:"https://uaelegislation.gov.ae/en/legislations/1227/download"},
+  fta:{t:"Federal Tax Authority — legislation, guides and clarifications",u:"https://tax.gov.ae/en/"},
+  mof:{t:"Ministry of Finance — tax legislation",u:"https://mof.gov.ae/"},
+  pen:{t:"CD 40/2017 and its amendments (MoF consolidated PDF)",u:"https://mof.gov.ae/wp-content/uploads/2025/11/Cabinet-Decision-No.-40-of-2017-and-its-amendments.pdf"},
+  ifrs:{t:"IFRS Foundation — issued standards (free registration)",u:"https://www.ifrs.org/issued-standards/list-of-standards/"}
+};
+const GROUPS = [["laws","Full legislation"],["all","Summaries"],["law","Primary law"],["regs","Executive Regulation"],["amend","Amendments 2022–2026"],["proc","Procedures & penalties"],["einv","E-invoicing"],["re","Real estate & zones"],["fta","FTA guidance"],["ifrs","IFRS alignment"],["index","Article index"]];
+const LIB = [
+ {id:"fdl8",g:"law",title:"Federal Decree-Law No. 8 of 2017 on Value Added Tax",ref:"FDL 8/2017",eff:"In force 1 January 2018",keys:["FDL"],
+  sum:"The principal VAT law. It sets the 5% standard rate, what counts as a supply, registration, date and place of supply, zero-rating and exemptions, reverse charge, input tax recovery, invoicing and records.",
+  pts:["Registration: mandatory Art 13 (AED 375,000), voluntary Art 17 (AED 187,500), tax groups Art 14.","Supply rules: date of supply Arts 25–26, place of supply Arts 27–33.","Rates: zero-rated Art 45, exempt Art 46; reverse charge on imports Art 48; designated zones Art 51.","Input tax: Arts 54–55 (recovery and conditions); bad debt relief Art 64.","Invoices and credit notes: Art 65 onwards; credit notes Art 70."],links:["vatLaw","mof"]},
+ {id:"cd52",g:"regs",title:"Executive Regulation — Cabinet Decision No. 52 of 2017",ref:"ER (CD 52/2017)",eff:"In force 1 January 2018; amended by CD 100/2024",keys:["ER"],
+  sum:"The operational rules behind the law: definitions of residential buildings and designated-zone conditions, export evidence, blocked input tax, apportionment, capital assets, invoice contents and record keeping.",
+  pts:["Blocked input tax: ER Art 53 (entertainment, vehicles available for personal use, employee personal benefits).","Apportionment of residual input tax: ER Art 55.","Tax invoice contents: ER Art 59; tax credit notes ER Art 60.","Capital Assets Scheme thresholds and adjustment periods."],links:["fta","mof"]},
+ {id:"cd100",g:"amend",title:"Cabinet Decision No. 100 of 2024 amending the Executive Regulation",ref:"CD 100/2024",eff:"In force 15 November 2024",keys:["CD 100"],tag:"new",
+  sum:"The largest update to the VAT regulations since 2018. FTA explains it in Public Clarification VATP040.",
+  pts:["Registration and tax group changes.","Profit margin scheme, supplies with more than one component.","Zero-rating of exported services tightened where the service benefits a person in the UAE; international transport and means of transport rules refined.","Financial services treatment, including virtual asset related matters.","Non-recoverable input tax, apportionment and Capital Assets Scheme adjustments revised.","Tax invoice and record-keeping rules relaxed and modernised."],links:["fta"]},
+ {id:"fdl18",g:"amend",title:"Federal Decree-Law No. 18 of 2022 amending the VAT Law",ref:"FDL 18/2022",eff:"In force 1 January 2023",keys:["FDL 18"],tag:"verify",
+  sum:"Amended several provisions of the VAT Law from 2023, including the limitation provision in Article 79 bis, which FDL 16/2025 later repealed. Check the consolidated MoF text for the full list of changed articles.",pts:[],links:["mof"]},
+ {id:"fdl1624",g:"amend",title:"Federal Decree-Law No. 16 of 2024 amending the VAT Law",ref:"FDL 16/2024",eff:"In force 30 October 2024",keys:["FDL 16/2024"],tag:"verify",
+  sum:"A further amendment to the VAT Law, reflected in the consolidated text published by the FTA. The FTA issued a public clarification in September 2026 covering both the 2024 and 2025 amendments — read it alongside the consolidated law.",pts:[],links:["fta"]},
+ {id:"fdl16",g:"amend",title:"Federal Decree-Law No. 16 of 2025 amending the VAT Law",ref:"FDL 16/2025",eff:"In force 1 January 2026",keys:["FDL 16"],tag:"new",
+  sum:"Targeted technical changes aimed at simpler compliance and tougher anti-evasion rules.",
+  pts:["Reverse charge: no self-invoice required; keep the supporting documents the Executive Regulation specifies.","Refunds: five-year limit to request refund of excess recoverable tax after reconciliation. Transitional window to 31 December 2026 where the five years lapsed or lapse within one year of 1 January 2026.","Anti-evasion: new clauses in Art 54 let the FTA deny input tax where a supply is part of a tax-evasion arrangement the recipient knew or should have known about.","Art 79 bis (limitation) repealed — limitation periods now follow the amended Tax Procedures Law."],links:["mof","fta"]},
+ {id:"tpl",g:"proc",title:"Tax Procedures Law — FDL 28 of 2022, amended by FDL 17 of 2025",ref:"TPL",eff:"In force 1 March 2023; amendments from 1 January 2026",keys:["TPL","FDL 28","FDL 17"],tag:"new",
+  sum:"Governs how all federal taxes are administered: registration procedures, record keeping, tax audits, assessments, voluntary disclosures, reconsideration and objections, refunds and limitation periods. FDL 17/2025 reshaped refunds, limitation periods and FTA powers.",
+  pts:["Voluntary disclosure to correct errors in returns or refunds.","Refund and credit-balance requests subject to a five-year window with transitional relief to 31 December 2026.","Disputes: reconsideration with the FTA, then the Tax Disputes Resolution Committee."],links:["fta","mof"]},
+ {id:"pen",g:"proc",title:"Administrative penalties — CD 40/2017 as amended by CD 49/2021 and CD 129/2025",ref:"CD 129/2025",eff:"New framework in force 14 April 2026",keys:["CD 129","CD 49","CD 40"],tag:"new",
+  sum:"CD 129/2025 replaced the compounding late-payment regime with an annual-rate penalty and recalibrated disclosure penalties for VAT and Excise Tax.",
+  pts:["Late payment: 14% per annum, calculated monthly on unpaid tax from the day after the due date, non-compounding. Replaces 2% immediately + 4% monthly (300% cap) under CD 49/2021.","Voluntary disclosure of a tax difference: 1% for each month or part month on the difference.","Errors found by the FTA first attract an additional fixed percentage — disclose before an audit is notified.","Fixed penalties (late registration, late filing, invoices, records) were revised. Confirm each amount in the official schedule before quoting it to a client."],links:["pen","fta"]},
+ {id:"einv",g:"einv",title:"E-invoicing — Ministerial Decisions 243 and 244 of 2025",ref:"MD 243/2025, MD 244/2025",eff:"Pilot from 1 July 2026",keys:["MD 243","MD 244"],tag:"new",
+  sum:"A national e-invoicing system using the Peppol network and the PINT-AE data standard, delivered through Accredited Service Providers (ASPs).",
+  pts:["Revenue of AED 50 million or more: appoint an ASP (originally 31 July 2026; reported extended to 30 October 2026 — verify) and go live 1 January 2027.","Revenue below AED 50 million: appoint an ASP by 31 March 2027 and go live 1 July 2027.","Government entities follow later (reported 1 October 2027).","B2C supplies and reverse-charge imports are outside scope unless a later decision says otherwise; e-invoice records must be stored in the UAE."],links:["mof","fta"]},
+ {id:"vatp040",g:"fta",title:"Public Clarification VATP040 — amendments to the Executive Regulation",ref:"VATP040",eff:"Published 14 March 2025",keys:["VATP040"],
+  sum:"FTA guidance on CD 100/2024: registration and tax groups, profit margin scheme, zero-rating of exports and transport, healthcare, financial services, non-recoverable input tax, apportionment and capital assets, records and tax invoices.",pts:[],links:["fta"]},
+ {id:"ftaguides",g:"fta",title:"FTA public clarifications and guides",ref:"FTA guidance",eff:"Ongoing",keys:["VATP"],tag:"verify",
+  sum:"The FTA publishes numbered public clarifications (VATP series) and topic guides — real estate, input tax apportionment, tax invoices, designated zones, tax groups, capital assets. VAT Desk only cites a VATP number when it is certain of it; check the number on the FTA site before putting it in client advice.",pts:[],links:["fta"]},
+ {id:"reres",g:"re",title:"Residential property",ref:"FDL Art 45(9), Art 46",eff:"",keys:["FDL 45","FDL 46"],
+  sum:"The first supply of a residential building, by sale or lease, within three years of completion is zero-rated, so the developer recovers its input tax. Later residential sales and leases are exempt, with no recovery on related costs.",
+  pts:["Serviced and hotel apartments where services beyond accommodation are provided are not residential — 5%.","Off-plan sales follow the same first-supply logic; watch the completion date and the three-year window.","Developers with both zero-rated and exempt supplies need apportionment and may fall in the Capital Assets Scheme."],links:["fta"]},
+ {id:"recom",g:"re",title:"Commercial property and mixed use",ref:"Standard rate",eff:"",keys:[],
+  sum:"Sales and leases of commercial property are standard rated at 5% with full recovery on related costs. Mixed-use developments split value on a fair and reasonable basis between commercial (5%) and residential (0% or exempt) elements.",pts:["Service charges follow the property they relate to.","Each lease invoice or payment creates a tax point for that period."],links:["fta"]},
+ {id:"reland",g:"re",title:"Bare land",ref:"FDL Art 46",eff:"",keys:[],
+  sum:"Land with no completed or partly completed buildings or civil engineering works is exempt. Land with infrastructure (roads, utilities) may not be bare land — the facts decide.",pts:[],links:["fta"]},
+ {id:"recas",g:"re",title:"Capital Assets Scheme",ref:"ER (capital assets)",eff:"Revised by CD 100/2024",keys:["CAS"],
+  sum:"Assets of AED 5,000,000 or more (excluding VAT) need annual input tax adjustments when taxable use changes — over 10 years for buildings and 5 years for other assets.",
+  pts:["Adjustment = (total input tax ÷ adjustment period) × (recovery % at acquisition − taxable use % this year).","Positive result: pay back to the FTA. Negative: extra recovery.","See the Calculators tab for a worked figure."],links:["fta"]},
+ {id:"redz",g:"re",title:"Designated zones",ref:"FDL Art 51",eff:"",keys:["FDL 51"],tag:"verify",
+  sum:"Qualifying supplies of goods within or between designated zones can be outside the scope of VAT when the zone's security and control conditions are met. Services supplied in a designated zone are taxed normally, as are goods consumed there.",
+  pts:["JAFZA appears on the FTA designated zones list — confirm the specific area for the client's premises.","Supplies from a designated zone to the mainland are taxable."],links:["fta"]},
+ {id:"ifrs15",g:"ifrs",title:"IFRS 15 and the VAT date of supply",ref:"IFRS 15",eff:"",keys:["IFRS 15"],
+  sum:"Revenue follows transfer of control; VAT follows the earliest of delivery or completion, payment, or tax invoice. Advances and early invoices create VAT before revenue — unbilled or accrued revenue may not yet have a tax point unless the supply is complete.",pts:["Reconcile revenue in the GL to Box 1 and Box 4 sales by tax point, not by revenue month."],links:["ifrs"]},
+ {id:"ifrs16",g:"ifrs",title:"IFRS 16 leases",ref:"IFRS 16",eff:"",keys:["IFRS 16"],
+  sum:"Right-of-use accounting does not move the VAT tax point. For periodic rent, each invoice or payment (whichever is earlier) is a supply for that period. Commercial rent is 5%, residential rent (after the first supply) is exempt.",pts:[],links:["ifrs"]},
+ {id:"ias16",g:"ifrs",title:"IAS 16 and IAS 2 — non-recoverable VAT",ref:"IAS 16",eff:"",keys:["IAS 16","IAS 2"],
+  sum:"Non-recoverable VAT, for example on exempt residential activity or blocked items, forms part of the cost of property, plant and equipment or inventory. Recoverable VAT is a receivable from the FTA, not a cost.",pts:[],links:["ifrs"]},
+ {id:"ifrs9",g:"ifrs",title:"IFRS 9 and financial services",ref:"IFRS 9",eff:"",keys:["IFRS 9"],
+  sum:"Margin-based income (interest spread) is exempt; explicit fees and commissions are taxable at 5%. Expected credit losses do not by themselves give bad debt relief — FDL Art 64 conditions must be met.",pts:[],links:["ifrs"]},
+ {id:"ias37",g:"ifrs",title:"IAS 37 — VAT assessments and penalties",ref:"IAS 37",eff:"",keys:["IAS 37","IFRIC 23"],
+  sum:"Probable VAT assessments and penalties are provisions under IAS 37. IFRIC 23 covers income taxes only, so it does not apply to VAT exposures.",pts:[],links:["ifrs"]},
+ {id:"ias21",g:"ifrs",title:"IAS 21 — foreign currency invoices",ref:"IAS 21",eff:"",keys:["IAS 21"],
+  sum:"Tax invoices in foreign currency must show the VAT amount in AED using the UAE Central Bank rate. Differences against the rate used in the books are accounting exchange differences, not VAT adjustments.",pts:[],links:["ifrs"]},
+ {id:"ias40",g:"ifrs",title:"IAS 40 — investment property",ref:"IAS 40",eff:"",keys:["IAS 40"],
+  sum:"Cost includes non-recoverable VAT. A change in use (for example from residential letting to commercial, or sale to rental) changes the VAT treatment going forward and can trigger Capital Assets Scheme adjustments even when the accounting classification stays the same.",pts:[],links:["ifrs"]},
+ {id:"ias8",g:"ifrs",title:"IAS 8 — correcting VAT errors",ref:"IAS 8",eff:"",keys:["IAS 8"],
+  sum:"A voluntary disclosure of a prior-period VAT error may also be a prior-period accounting error. Material errors are restated retrospectively; penalties are expenses of the period in which they arise.",pts:[],links:["ifrs"]},
+ {id:"ias1",g:"ifrs",title:"IAS 1 / IFRS 18 — presenting VAT balances",ref:"IAS 1",eff:"IFRS 18 replaces IAS 1 from 2027",keys:["IAS 1","IFRS 18"],
+  sum:"Revenue is presented net of output VAT. VAT receivable and payable are generally offset only where there is a legal right of set-off with the FTA. Disclose material VAT exposures and assessments.",pts:[],links:["ifrs"]}
+];
+const INDEX = [
+ ["FDL Art 13","Mandatory registration — AED 375,000",""],["FDL Art 14","Tax groups",""],["FDL Art 17","Voluntary registration — AED 187,500",""],
+ ["FDL Art 25","Date of supply — general rule",""],["FDL Art 26","Date of supply — special cases",""],["FDL Art 27","Place of supply of goods",""],
+ ["FDL Art 29","Place of supply of services — general",""],["FDL Art 30","Place of supply — special cases incl. real estate","verify"],
+ ["FDL Art 45","Zero-rated supplies (residential first supply: 45(9))",""],["FDL Art 46","Exempt supplies",""],["FDL Art 48","Reverse charge on imports",""],
+ ["FDL Art 51","Designated zones",""],["FDL Art 54","Recoverable input tax (+ 2026 anti-evasion clauses)","new"],["FDL Art 55","Conditions to recover input tax",""],
+ ["FDL Art 64","Bad debt relief",""],["FDL Art 65","Tax invoices",""],["FDL Art 70","Tax credit notes",""],
+ ["ER Art 53","Non-recoverable (blocked) input tax",""],["ER Art 55","Input tax apportionment",""],["ER Art 59","Tax invoice contents",""],["ER Art 60","Tax credit note contents",""],
+ ["CD 129/2025","Administrative penalties (from 14 Apr 2026)","new"],["MD 244/2025","E-invoicing implementation timeline","new"]
+];
+</script>
+<script>
+"use strict";
+/* ============ Utilities ============ */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num = v => { const n = parseFloat(String(v ?? "").replace(/[, ]/g, "")); return isFinite(n) ? n : NaN; };
+const aed = n => isFinite(n) ? "AED " + Number(n).toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2}) : "—";
+const newId = p => p + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const today = () => new Date().toISOString().slice(0, 10);
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2800); }
+const scriptCache = {};
+function loadScript(src){
+  if (!scriptCache[src]) scriptCache[src] = new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("Could not load " + src)); document.head.appendChild(s); });
+  return scriptCache[src];
+}
+const LIBS = {
+  pdf: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+  pdfWorker: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
+  mammoth: "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js",
+  xlsx: "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",
+  jszip: "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+  jspdf: "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+  autotable: "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
+};
+const ERR = {
+  not_granted: "AI access was declined for this page. Reload and allow it to use Ask, Review and Reports.",
+  rate_limited: "Too many requests right now. Wait a moment, then try again.",
+  prompt_too_large: "That's too much text for one request. Split the file into smaller parts.",
+  invalid_json: "The result couldn't be read. Try again, or tick Deep review.",
+  images_unavailable: "Image reading isn't available in this view, so scanned pages can't be read.",
+  image_rejected: "One of the images couldn't be read. Use a JPG or PNG under 20 MB.",
+  sampling_disabled: "AI is switched off for this account.",
+  cancelled: "Stopped."
+};
+const errText = e => (e?.code === "bad_key" || e?.code === "api_error" || e?.code === "network") ? e.message : ERR[e?.code] || e?.message || "Something went wrong. Try again.";
+
+/* ============ Runtime + storage ============ */
+const S = { sample:null, db:null, uid:null, dl:null, imgMax:0, clients:[], reviews:[], active:"", turns:[], queue:[], report:null };
+const store = {
+  base(kind){ return `data/users/${S.uid}/ws/${kind}`; },
+  ls(kind){ try { return JSON.parse(localStorage.getItem("vatdesk:" + kind) || "[]"); } catch { return []; } },
+  lsSave(kind, arr){ try { localStorage.setItem("vatdesk:" + kind, JSON.stringify(arr)); } catch {} },
+  async list(kind){
+    if (S.db) { try { const snap = await S.db.collection(this.base(kind)).get(); return snap.docs.map(d => ({...d.data(), id:d.id})); } catch (e) { console.warn(e); } }
+    return this.ls(kind);
+  },
+  async put(kind, obj){
+    if (S.db) { try { await S.db.collection(this.base(kind)).doc(obj.id).set(JSON.parse(JSON.stringify(obj))); return; } catch (e) { console.warn(e); toast("Couldn't save online — kept in this browser."); } }
+    const arr = this.ls(kind).filter(x => x.id !== obj.id); arr.push(obj); this.lsSave(kind, arr);
+  },
+  async del(kind, id){
+    if (S.db) { try { await S.db.collection(this.base(kind)).doc(id).delete(); return; } catch (e) { console.warn(e); } }
+    this.lsSave(kind, this.ls(kind).filter(x => x.id !== id));
+  }
+};
+/* ---- Standalone mode: direct Anthropic API with the user's own key ---- */
+const API_MODELS = {quick:"claude-haiku-5-5", default:"claude-sonnet-5-5", complex:"claude-opus-5-5"};
+const getKey = () => { try { return localStorage.getItem("vatdesk:apikey") || ""; } catch { return ""; } };
+const b64 = blob => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1]); fr.onerror = rej; fr.readAsDataURL(blob); });
+async function apiSample(input, opts = {}){
+  const msgs = (typeof input === "string" ? [{role:"user", content:input}] : input.map(m => ({role:m.role, content:m.content})));
+  if (opts.images) {
+    const imgs = Array.from(opts.images.length !== undefined ? opts.images : [opts.images]);
+    const last = msgs[msgs.length - 1];
+    const blocks = [];
+    for (const im of imgs) blocks.push({type:"image", source:{type:"base64", media_type:/^image\/(png|jpeg|webp|gif)$/.test(im.type) ? im.type : "image/jpeg", data: await b64(im)}});
+    last.content = [...blocks, {type:"text", text:last.content}];
+  }
+  const tier = opts.modelTier || "default";
+  let r;
+  try {
+    r = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", signal:opts.signal,
+      headers:{"content-type":"application/json","x-api-key":getKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body: JSON.stringify({model:API_MODELS[tier] || API_MODELS.default, max_tokens: tier === "complex" ? 16000 : 8192, messages:msgs}) });
+  } catch (e) { throw e.name === "AbortError" ? {code:"cancelled", message:"Stopped."} : {code:"network", message:"Couldn't reach the Anthropic API. Check your connection."}; }
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const msg = data?.error?.message || ("API error " + r.status);
+    throw {code: r.status === 401 || r.status === 403 ? "bad_key" : r.status === 429 || r.status === 529 ? "rate_limited" : r.status === 413 ? "prompt_too_large" : "api_error", message: r.status === 401 ? "The API key was rejected. Check it under API key." : msg};
+  }
+  const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n");
+  opts.onText?.({text, delta:text});
+  return {text, truncated: data.stop_reason === "max_tokens"};
+}
+apiSample.json = async (input, opts) => {
+  const {text} = await apiSample(typeof input === "string" ? input + "\n\nReply with JSON only." : input, opts);
+  const tries = [text, (text.match(/```(?:json)?\s*([\s\S]*?)```/) || [])[1]];
+  const a = text.search(/[\[{]/), b = Math.max(text.lastIndexOf("}"), text.lastIndexOf("]"));
+  if (a >= 0 && b > a) tries.push(text.slice(a, b + 1));
+  for (const t of tries) { if (!t) continue; try { return JSON.parse(t); } catch {} }
+  throw {code:"invalid_json", message:ERR.invalid_json, text};
+};
+apiSample.limits = async () => ({images:{maxCount:5}});
+function setupStandalone(){
+  S.standalone = true;
+  $("#keyBtn").classList.remove("hidden");
+  if (getKey()) { S.sample = apiSample; S.imgMax = 5; }
+  else $("#keyNote").classList.remove("hidden");
+}
+function openKey(){ $("#keyIn").value = getKey(); $("#keyDlg").showModal(); $("#keyIn").focus(); }
+$("#keyBtn").onclick = openKey; $("#keyBtn2").onclick = openKey;
+$("#keyCancel").onclick = () => $("#keyDlg").close();
+$("#keyClear").onclick = () => { try { localStorage.removeItem("vatdesk:apikey"); } catch {} location.reload(); };
+$("#keyForm").addEventListener("submit", e => { e.preventDefault(); const k = $("#keyIn").value.trim(); if (!k) return; try { localStorage.setItem("vatdesk:apikey", k); } catch { toast("This browser blocks storage, so the key can't be kept."); return; } location.reload(); });
+
+async function initRuntime(){
+  const c = window.claude;
+  if (c && c.use) {
+    const [sample, db, user, dl] = await Promise.all(["sample","db","user","downloads"].map(n => c.use(n).catch(() => null)));
+    S.sample = sample; S.dl = dl;
+    if (db && user) { try { const id = await user.id(); if (id) { S.db = db; S.uid = id; } } catch {} }
+    if (sample) { try { const lim = await sample.limits(); S.imgMax = lim?.images?.maxCount || 0; } catch {} }
+  }
+  if (!S.sample) setupStandalone();
+  const on = !!S.sample;
+  $("#aiStatus").innerHTML = `<span class="status-dot ${on ? "on" : ""}"></span>${on ? (S.standalone ? "AI via your API key" : "AI connected") : "AI needs an API key"}`;
+  $("#storeNote").textContent = S.db ? "Client files are saved to your private workspace and are not visible to people you share this page with." : "Client files are kept in this browser only.";
+  if (!on) { $$("#askBtn,#runReview,#genReport").forEach(b => b.disabled = true); }
+  await loadData();
+}
+async function loadData(){
+  S.clients = (await store.list("clients")).sort((a,b) => a.name.localeCompare(b.name));
+  S.reviews = (await store.list("reviews")).sort((a,b) => (b.createdAt||"").localeCompare(a.createdAt||""));
+  try { S.active = localStorage.getItem("vatdesk:active") || ""; } catch {}
+  if (S.active && !S.clients.find(c => c.id === S.active)) S.active = "";
+  renderClientSel(); renderClients(); renderLedger(); renderPick();
+}
+const activeClient = () => S.clients.find(c => c.id === S.active) || null;
+function clientContext(){
+  const c = activeClient();
+  if (!c) return "CLIENT: none selected (general question).";
+  return `CLIENT: ${c.name}; TRN ${c.trn || "not given"}; sector ${c.sector}; location ${c.zone}; tax period ${c.period}; notes: ${c.notes || "none"}.`;
+}
+
+/* ============ Navigation ============ */
+function go(view){
+  $$(".nav button").forEach(b => { if (b.dataset.view === view) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  $$(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + view));
+  $("#main").scrollTop = 0;
+}
+$$(".nav button").forEach(b => b.addEventListener("click", () => go(b.dataset.view)));
+
+/* ============ Markdown + citation chips ============ */
+const CITE_RE = /\b(?:FDL|ER|TPL)\s+Art(?:icle)?\.?\s*\d+(?:\s*bis)?(?:\(\d+\))*(?:\([a-z]\))?|\b(?:CD|MD)\s+\d{1,3}\/\d{4}|\bVATP\d{3}\b|\b(?:IFRS|IAS|IFRIC)\s+\d{1,2}\b/g;
+function inline(s){
+  let h = esc(s);
+  const codes = [];
+  h = h.replace(/`([^`]+)`/g, (_, c) => { codes.push(c); return `\u0000${codes.length - 1}\u0000`; });
+  h = h.replace(CITE_RE, m => `<button class="cite" data-ref="${m}">${m}</button>`);
+  h = h.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  h = h.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${codes[i]}</code>`);
+  return h;
+}
+function md(src){
+  const lines = String(src || "").replace(/\r/g, "").split("\n");
+  let out = "", list = null, para = [];
+  const flushP = () => { if (para.length) { out += `<p>${inline(para.join(" "))}</p>`; para = []; } };
+  const flushL = () => { if (list) { out += `</${list}>`; list = null; } };
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i], t = l.trim();
+    if (!t) { flushP(); flushL(); continue; }
+    if (/^\|.*\|$/.test(t)) {
+      flushP(); flushL();
+      const rows = [];
+      while (i < lines.length && /^\|.*\|$/.test(lines[i].trim())) { rows.push(lines[i].trim()); i++; }
+      i--;
+      const cells = r => r.slice(1, -1).split("|").map(c => c.trim());
+      const body = rows.filter(r => !/^\|[\s:|-]+\|$/.test(r));
+      out += "<table>" + body.map((r, k) => "<tr>" + cells(r).map(c => k === 0 ? `<th>${inline(c)}</th>` : `<td>${inline(c)}</td>`).join("") + "</tr>").join("") + "</table>";
+      continue;
+    }
+    let m;
+    if ((m = t.match(/^#{1,6}\s+(.*)$/))) { flushP(); flushL(); out += `<h3>${inline(m[1])}</h3>`; continue; }
+    if ((m = t.match(/^[-*•]\s+(.*)$/))) { flushP(); if (list !== "ul") { flushL(); out += "<ul>"; list = "ul"; } out += `<li>${inline(m[1])}</li>`; continue; }
+    if ((m = t.match(/^\d+[.)]\s+(.*)$/))) { flushP(); if (list !== "ol") { flushL(); out += "<ol>"; list = "ol"; } out += `<li>${inline(m[1])}</li>`; continue; }
+    flushL(); para.push(t);
+  }
+  flushP(); flushL();
+  return out;
+}
+const plain = s => String(s || "").replace(/\*\*([^*]+)\*\*/g, "$1").replace(/`([^`]+)`/g, "$1").replace(/^#{1,6}\s+/gm, "");
+document.addEventListener("click", e => { const b = e.target.closest(".cite"); if (b) openRef(b.dataset.ref); });
+
+/* ============ Library ============ */
+let libGroup = "laws";
+function refKeys(code){
+  const c = code.replace(/\s+/g, " ").trim();
+  let m;
+  if ((m = c.match(/^(FDL|ER|TPL) Art(?:icle)?\.? ?(\d+)/))) return [`${m[1]} ${m[2]}`, m[1]];
+  if ((m = c.match(/^(CD|MD) (\d+)\//))) return [`${m[1]} ${m[2]}`];
+  return [c];
+}
+function openRef(code){
+  if (openLawRef(code)) return;
+  go("library");
+  const keys = refKeys(code);
+  const hit = LIB.find(e => keys.some(k => e.keys.includes(k)));
+  libGroup = hit ? hit.g : "all";
+  $("#libSearch").value = hit ? "" : code;
+  renderLib();
+  if (hit) {
+    const el = document.getElementById("lib-" + hit.id);
+    if (el) { el.scrollIntoView({block:"start", behavior:"smooth"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
+  }
+  const row = INDEX.find(r => refKeys(r[0])[0] === keys[0]);
+  if (row && !hit) { libGroup = "index"; $("#libSearch").value = ""; renderLib(); }
+}
+function renderLib(){
+  $("#libGroups").innerHTML = GROUPS.map(([k, t]) => `<button data-g="${k}" aria-pressed="${k === libGroup}">${t}</button>`).join("");
+  const q = $("#libSearch").value.trim().toLowerCase();
+  const box = $("#libList");
+  if (libGroup === "laws") { renderLaws(box, q); return; }
+  if (libGroup === "index" && !q) {
+    box.innerHTML = `<div class="entry"><h4>Article index</h4><p class="muted">Quick reference to the provisions used most in practice. Tap a reference to ask about it.</p></div>
+      <div class="scroll-x"><table class="idx"><thead><tr><th>Reference</th><th>Topic</th></tr></thead><tbody>${INDEX.map(r => `<tr><td><button class="cite" data-ask="${esc(r[0])}">${esc(r[0])}</button></td><td>${esc(r[1])}${r[2] === "verify" ? '<span class="tag verify">check numbering</span>' : r[2] === "new" ? '<span class="tag new">2026</span>' : ""}</td></tr>`).join("")}</tbody></table></div>`;
+    $$("[data-ask]", box).forEach(b => b.addEventListener("click", e => { e.stopPropagation(); askAbout(`Explain ${b.dataset.ask} in practice — what it requires, common mistakes, and recent changes.`); }, true));
+    return;
+  }
+  const items = LIB.filter(e => (libGroup === "all" || e.g === libGroup || q) && (!q || (e.title + " " + e.ref + " " + e.sum + " " + e.pts.join(" ")).toLowerCase().includes(q)));
+  const idxHits = q ? INDEX.filter(r => (r[0] + " " + r[1]).toLowerCase().includes(q)) : [];
+  if (!items.length && !idxHits.length) { box.innerHTML = `<div class="empty"><strong>Nothing matches “${esc(q)}”</strong>Try a broader word, or ask the question directly.<div style="margin-top:12px"><button class="btn small" id="askMiss">Ask about “${esc(q)}”</button></div></div>`; $("#askMiss").onclick = () => askAbout(q); return; }
+  box.innerHTML = items.map(e => `<article class="entry" id="lib-${e.id}">
+      <h4>${esc(e.title)}${e.tag === "new" ? '<span class="tag new">Recent</span>' : e.tag === "verify" ? '<span class="tag verify">Check details</span>' : ""}</h4>
+      <div class="ref">${esc(e.ref)}${e.eff ? " — " + esc(e.eff) : ""}</div>
+      <p>${inline(e.sum)}</p>${e.pts.length ? `<ul>${e.pts.map(p => `<li>${inline(p)}</li>`).join("")}</ul>` : ""}
+      <div class="acts">${e.links.map(k => `<a class="btn small" href="${LINKS[k].u}" target="_blank" rel="noopener">${esc(LINKS[k].t)}</a>`).join("")}<button class="btn small" data-askent="${e.id}">Ask about this</button></div></article>`).join("")
+    + (idxHits.length ? `<div class="entry"><h4>Article index matches</h4><ul>${idxHits.map(r => `<li><button class="cite" data-ask="${esc(r[0])}">${esc(r[0])}</button> ${esc(r[1])}</li>`).join("")}</ul></div>` : "");
+  $$("[data-askent]", box).forEach(b => b.onclick = () => { const e = LIB.find(x => x.id === b.dataset.askent); askAbout(`Explain ${e.title} (${e.ref}) for a practitioner: key rules, effective dates, practical impact and common errors.`); });
+  $$("[data-ask]", box).forEach(b => b.addEventListener("click", ev => { ev.stopPropagation(); askAbout(`Explain ${b.dataset.ask} in practice — what it requires, common mistakes, and recent changes.`); }, true));
+}
+$("#libGroups").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; libGroup = b.dataset.g; $("#libSearch").value = ""; renderLib(); });
+$("#libSearch").addEventListener("input", renderLib);
+
+/* ============ Ask ============ */
+let askCtl = null;
+function rulesTurn(ext = ""){ return `${ANSWER_RULES}\n${GROUND_RULES}\n\n${KB}\n\n${ext}\n\n${clientContext()}\nToday's date: ${today()}.`; }
+function askAbout(q){ go("ask"); $("#askInput").value = q; $("#askInput").focus(); }
+function addUserMsg(t){ const d = document.createElement("div"); d.className = "msg-user"; d.textContent = t; $("#chat").appendChild(d); }
+async function ask(){
+  const q = $("#askInput").value.trim();
+  if (!q || !S.sample) return;
+  $("#starter").classList.add("hidden");
+  $("#askInput").value = "";
+  addUserMsg(q);
+  S.turns.push({role:"user", content:q});
+  const box = document.createElement("div"); box.className = "msg-ai";
+  box.innerHTML = `<div class="md"><p class="thinking">Checking the law and guidance…</p></div>`;
+  $("#chat").appendChild(box); box.scrollIntoView({block:"end"});
+  const out = $(".md", box);
+  askCtl = new AbortController();
+  $("#askBtn").classList.add("hidden"); $("#stopAsk").classList.remove("hidden");
+  const prevQ = S.turns.filter(t => t.role === "user").slice(-2, -1)[0]?.content || "";
+  const hits = retrieve(q + " " + prevQ, 10, 30000);
+  const history = S.turns.slice(-12);
+  if (history[0].role !== "user") history.shift();
+  try {
+    const { text } = await S.sample([{role:"user", content:rulesTurn(formatExtracts(hits))}, ...history], {
+      cache:false, signal:askCtl.signal, onText: ({text}) => { out.innerHTML = md(text); }
+    });
+    S.turns.push({role:"assistant", content:text});
+    if (hits.length) box.insertAdjacentHTML("beforeend", groundedChips(hits));
+    addAnswerTools(box, q, text);
+  } catch (e) {
+    if (e.text) out.innerHTML = md(e.text); else out.innerHTML = "";
+    const p = document.createElement("p"); p.className = "muted"; p.textContent = errText(e); out.appendChild(p);
+    S.turns.pop();
+  } finally {
+    $("#askBtn").classList.remove("hidden"); $("#stopAsk").classList.add("hidden");
+  }
+}
+function addAnswerTools(box, q, text){
+  const t = document.createElement("div"); t.className = "tools";
+  t.innerHTML = `<button class="btn small" data-a="copy">Copy</button><button class="btn small" data-a="save">Save to client file</button>`;
+  t.addEventListener("click", async e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "copy") { try { await navigator.clipboard.writeText(plain(text)); toast("Copied"); } catch { toast("Copy isn't available here — select the text instead."); } }
+    if (a === "save") {
+      const rec = { id:newId("adv"), clientId:S.active, kind:"advice", fileName:"Advisory Q&A", docType:"advice", title:q.slice(0, 120), summary:plain(text).slice(0, 6000), findings:[], checks:[], verify:[], confidence:"", createdAt:new Date().toISOString() };
+      await store.put("reviews", rec); S.reviews.unshift(rec); renderLedger(); renderPick();
+      toast(activeClient() ? `Saved to ${activeClient().name}` : "Saved to General"); e.target.disabled = true; e.target.textContent = "Saved";
+    }
+  });
+  box.appendChild(t);
+}
+$("#askBtn").onclick = ask;
+$("#stopAsk").onclick = () => askCtl?.abort();
+$("#askInput").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); } });
+$("#starter").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { $("#askInput").value = b.dataset.q; ask(); } });
+$("#newChat").onclick = () => { S.turns = []; $("#chat").innerHTML = ""; $("#starter").classList.remove("hidden"); $("#askInput").focus(); };
+
+/* ============ File extraction ============ */
+const MAX_TEXT = 90000;
+const ext = n => (n.split(".").pop() || "").toLowerCase();
+function guessKind(name){
+  const n = name.toLowerCase(), x = ext(n);
+  if (/(return|201|vat ?workings?)/.test(n)) return "return";
+  if (/(gl|ledger|trial|tb|journal|vat ?report|fbl3n|fagll03)/.test(n) && ["xlsx","xls","csv","ods","txt"].includes(x)) return "gl";
+  if (/(contract|agreement|spa|lease|tenancy|lpo|purchase order|mou|sow)/.test(n)) return "contract";
+  if (/(inv|bill|receipt|credit ?note|cn|tax)/.test(n)) return "invoice";
+  if (["xlsx","xls","csv","ods"].includes(x)) return "gl";
+  return "auto";
+}
+async function extract(file, opt = {}){
+  const x = ext(file.name), type = file.type || "";
+  const res = { text:"", images:[], note:"" };
+  if (x === "pdf" || type === "application/pdf") {
+    await loadScript(LIBS.pdf); await loadScript(LIBS.pdfWorker);
+    const pdfjs = window.pdfjsLib; pdfjs.GlobalWorkerOptions.workerSrc = LIBS.pdfWorker;
+    const doc = await pdfjs.getDocument({data: new Uint8Array(await file.arrayBuffer())}).promise;
+    const pages = opt.full ? doc.numPages : Math.min(doc.numPages, 80); let txt = "";
+    for (let p = 1; p <= pages; p++) { const pg = await doc.getPage(p); const tc = await pg.getTextContent(); txt += `\n--- Page ${p} ---\n` + tc.items.map(i => i.str + (i.hasEOL ? "\n" : " ")).join(""); }
+    if (doc.numPages > pages) res.note = `Only the first ${pages} of ${doc.numPages} pages were read.`;
+    const avg = txt.replace(/\s|---|Page \d+/g, "").length / pages;
+    if (avg < 60 && opt.full) throw new Error("This PDF has no text layer (scanned), so it can't be split into articles. Use the text PDF from the official site.");
+    if (avg < 60) {
+      if (!S.imgMax) { res.note = "This looks like a scanned PDF, and image reading isn't available here."; }
+      else {
+        const n = Math.min(doc.numPages, S.imgMax, 6);
+        for (let p = 1; p <= n; p++) {
+          const pg = await doc.getPage(p); const vp0 = pg.getViewport({scale:1}); const scale = Math.min(2, 1600 / Math.max(vp0.width, vp0.height));
+          const vp = pg.getViewport({scale}); const cv = document.createElement("canvas"); cv.width = vp.width; cv.height = vp.height;
+          await pg.render({canvasContext: cv.getContext("2d"), viewport: vp}).promise;
+          res.images.push(await new Promise(r => cv.toBlob(r, "image/jpeg", 0.85)));
+        }
+        res.note = `Scanned PDF — read ${n} page image${n > 1 ? "s" : ""}${doc.numPages > n ? ` of ${doc.numPages}` : ""}.`;
+      }
+    }
+    res.text = txt;
+  } else if (["png","jpg","jpeg","webp","gif"].includes(x) || /^image\/(png|jpe?g|webp|gif)/.test(type)) {
+    if (!S.imgMax) throw new Error("Image reading isn't available in this view.");
+    res.images.push(file); res.text = "(The document is the attached image.)";
+  } else if (["heic","heif","tif","tiff","bmp"].includes(x)) {
+    throw new Error("Convert this image to JPG or PNG first.");
+  } else if (x === "docx") {
+    await loadScript(LIBS.mammoth); const r = await window.mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()}); res.text = r.value;
+  } else if (x === "doc") {
+    throw new Error("Old .doc format — save it as .docx or PDF and upload again.");
+  } else if (["xlsx","xls","xlsm","ods"].includes(x)) {
+    await loadScript(LIBS.xlsx); const wb = window.XLSX.read(new Uint8Array(await file.arrayBuffer()), {type:"array", cellDates:true});
+    res.text = wb.SheetNames.map(n => { const sh = wb.Sheets[n]; const rng = sh["!ref"] ? window.XLSX.utils.decode_range(sh["!ref"]) : null; return `### Sheet: ${n}${rng ? ` (${rng.e.r + 1} rows)` : ""}\n` + window.XLSX.utils.sheet_to_csv(sh, {blankrows:false}); }).join("\n\n");
+  } else if (x === "pptx") {
+    await loadScript(LIBS.jszip); const zip = await window.JSZip.loadAsync(await file.arrayBuffer());
+    const slides = Object.keys(zip.files).filter(f => /^ppt\/slides\/slide\d+\.xml$/.test(f)).sort((a,b) => parseInt(a.match(/\d+/)[0]) - parseInt(b.match(/\d+/)[0]));
+    for (const s of slides) { const xml = await zip.file(s).async("string"); res.text += `\n--- ${s.match(/slide\d+/)[0]} ---\n` + (xml.match(/<a:t>([^<]*)<\/a:t>/g) || []).map(t => t.replace(/<\/?a:t>/g, "")).join(" "); }
+  } else if (x === "msg") {
+    throw new Error("Outlook .msg isn't readable here — save the email as .eml or PDF.");
+  } else if (["zip","rar","7z","exe"].includes(x)) {
+    throw new Error("Unzip and upload the files inside.");
+  } else {
+    let t = await file.text();
+    if (["html","htm"].includes(x)) t = t.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/gi, "").replace(/<[^>]+>/g, " ").replace(/\s{2,}/g, " ");
+    if (x === "eml") t = t.replace(/\n[A-Za-z0-9+/=]{76,}\n/g, "\n");
+    res.text = t;
+  }
+  if (!opt.full && res.text.length > MAX_TEXT) { res.note = (res.note ? res.note + " " : "") + `Text truncated to the first ${MAX_TEXT.toLocaleString()} characters of ${res.text.length.toLocaleString()}.`; res.text = res.text.slice(0, MAX_TEXT); }
+  if (!res.text.trim() && !res.images.length) throw new Error("No readable content found in this file.");
+  return res;
+}
+
+/* ============ Review ============ */
+const KIND_LABEL = {auto:"Detect automatically", invoice:"Invoice / bill / credit note", contract:"Contract / SPA / lease", gl:"GL / VAT ledger extract", return:"VAT return workings"};
+const GUIDE = {
+  invoice:"Treat it as a tax invoice, supplier bill or credit note. Run every ER Art 59 (or ER Art 60 for credit notes) content check and list each as a check. Recompute VAT = 5% of net for standard-rated lines; check the TRN has 15 digits; foreign-currency invoices must show VAT in AED; a non-resident supplier means reverse charge (no VAT charged by supplier); flag likely blocked input tax (ER Art 53); flag invoices issued more than 14 days after the date of supply; note whether input tax is recoverable for the client given its supply mix.",
+  contract:"Treat it as a contract, SPA or lease. Identify each supply and its VAT treatment (apply real estate rules: residential first supply within 3 years 0%, later residential exempt, commercial 5%, bare land exempt, serviced apartments 5%). Check the VAT clause (VAT-exclusive pricing, who bears VAT, change-in-law clause, invoicing obligations), tax point triggers (advances, milestones, handover), place of supply, designated zone points, completion-certificate dates, compensation or penalty payments, and e-invoicing readiness clauses.",
+  gl:"Treat it as a GL or VAT ledger extract. Look for VAT not equal to 5% of net on standard lines, input VAT posted on likely-blocked accounts (entertainment, vehicles, staff welfare), missing or invalid TRNs, duplicate invoice numbers, foreign suppliers without reverse charge entries, input tax recovered on exempt-related costs, large credit notes, cut-off issues, and unpaid invoices older than 6 months past the due date with input tax still claimed (FDL Art 55). Quantify VAT impact in AED where the data allows, and state if only part of the rows was available.",
+  return:"Treat it as VAT return (Form 201) workings. Check Box 1 standard-rated supplies by emirate, Box 2 tourist refunds, Box 3 reverse-charge supplies, Box 4 zero-rated, Box 5 exempt, Box 6 and 7 imports and adjustments, Box 9 standard-rated expenses, Box 10 reverse-charge input. Check arithmetic, consistency between Box 3 and Box 10, need for apportionment when Box 5 has value, annual adjustment timing, and reconcile to any GL data given.",
+  auto:"First identify the document type (invoice, bill, credit note, contract, SPA, lease, GL extract, VAT return workings, customs declaration, email or other), then apply the matching checks a UAE VAT reviewer would run."
+};
+function reviewPrompt(item, x){
+  return `${ANSWER_RULES.split("\n").slice(0, 1).join("")}
+Review the document below for UAE VAT compliance and exposure.
+${GROUND_RULES}
+
+${KB}
+
+${formatExtracts(retrieve(GUIDE[item.kind] + " " + x.text.slice(0, 4000), 8, 20000))}
+
+${clientContext()}
+Today's date: ${today()}.
+File name: ${item.name}
+Reviewer focus: ${GUIDE[item.kind]}
+${x.note ? "Extraction note: " + x.note : ""}
+
+Reply with ONLY one JSON object, no other text, in exactly this shape:
+{"doc_type":"tax_invoice|supplier_bill|credit_note|contract|spa|lease|gl_extract|vat_ledger|vat_return_workings|customs|email|other",
+ "title":"short descriptive title, e.g. 'Tax invoice INV-204 — ABC Contracting'",
+ "summary":"2-4 sentences: what it is and the VAT position",
+ "parties":{"supplier":"","supplier_trn":"","recipient":"","recipient_trn":""},
+ "figures":{"document_date":"","currency":"","net":null,"vat":null,"gross":null},
+ "treatment":{"classification":"standard_5|zero_rated|exempt|out_of_scope|reverse_charge|mixed|unclear","rationale":"","refs":["FDL Art 45(9)"]},
+ "findings":[{"severity":"high|medium|low|info","area":"invoice_compliance|input_tax|output_tax|reverse_charge|real_estate|place_of_supply|date_of_supply|records|reconciliation|penalty_exposure|e_invoicing|other","issue":"","evidence":"quote the figure or line","ref":"FDL Art 55","recommendation":"","vat_impact_aed":null}],
+ "checks":[{"check":"","status":"pass|fail|unclear|n/a"}],
+ "confidence":"high|medium|low",
+ "verify":["points to confirm with the client or the official text"]}
+Rules: at most 12 findings, most important first; use null for unknown numbers; cite only article numbers you are sure of; if the document is unreadable or not VAT relevant, say so in summary with no findings.
+
+DOCUMENT CONTENT:
+${x.text}`;
+}
+function renderQueue(){
+  const p = $("#queuePanel"), bar = $("#queueBar");
+  p.classList.toggle("hidden", !S.queue.length); bar.classList.toggle("hidden", !S.queue.length);
+  p.innerHTML = S.queue.map(q => `<div class="qrow" data-id="${q.id}">
+      <div class="name" title="${esc(q.name)}">${esc(q.name)}<div class="muted" style="font-size:12px;font-weight:400">${(q.size/1024).toFixed(0)} KB${q.err ? " — " + esc(q.err) : q.note ? " — " + esc(q.note) : ""}</div></div>
+      <select aria-label="Document type for ${esc(q.name)}" ${q.status !== "queued" && q.status !== "error" ? "disabled" : ""}>${Object.entries(KIND_LABEL).map(([k,v]) => `<option value="${k}" ${k === q.kind ? "selected" : ""}>${v}</option>`).join("")}</select>
+      <span class="qstatus"><span class="pill ${q.status === "running" || q.status === "reading" ? "run" : q.status === "done" ? "done" : q.status === "error" ? "err" : ""}">${{queued:"Waiting",reading:"Reading file",running:"Reviewing",done:"Done",error:"Failed"}[q.status]}</span></span>
+      <button class="btn ghost small" aria-label="Remove ${esc(q.name)}" data-rm ${q.status === "running" || q.status === "reading" ? "disabled" : ""}>✕</button></div>`).join("");
+  const done = S.queue.filter(q => q.status === "done").length;
+  $("#queueNote").textContent = `${S.queue.length} file${S.queue.length > 1 ? "s" : ""} — ${done} reviewed`;
+}
+$("#queuePanel").addEventListener("change", e => { const row = e.target.closest(".qrow"); const q = S.queue.find(x => x.id === row.dataset.id); if (q) q.kind = e.target.value; });
+$("#queuePanel").addEventListener("click", e => { if (!e.target.closest("[data-rm]")) return; const id = e.target.closest(".qrow").dataset.id; S.queue = S.queue.filter(q => q.id !== id); renderQueue(); });
+function addFiles(list){
+  for (const f of list) S.queue.push({ id:newId("q"), file:f, name:f.name, size:f.size, kind:guessKind(f.name), status:"queued", err:"", note:"" });
+  renderQueue();
+}
+const drop = $("#drop");
+drop.onclick = () => $("#fileIn").click();
+drop.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#fileIn").click(); } };
+$("#fileIn").onchange = e => { addFiles(e.target.files); e.target.value = ""; };
+["dragenter","dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => addFiles(e.dataTransfer.files));
+$("#clearQueue").onclick = () => { S.queue = S.queue.filter(q => q.status === "running" || q.status === "reading"); renderQueue(); };
+let revCtl = null, revStop = false;
+const SEV_ORDER = {high:0, medium:1, low:2, info:3};
+function normReview(r){
+  const f = Array.isArray(r.findings) ? r.findings.filter(Boolean).map(x => ({severity: SEV_ORDER[x.severity] !== undefined ? x.severity : "info", area:x.area || "other", issue:String(x.issue || ""), evidence:String(x.evidence || ""), ref:String(x.ref || ""), recommendation:String(x.recommendation || ""), vat_impact_aed: isFinite(num(x.vat_impact_aed)) ? num(x.vat_impact_aed) : null})) : [];
+  f.sort((a,b) => SEV_ORDER[a.severity] - SEV_ORDER[b.severity]);
+  return { docType:String(r.doc_type || "other"), title:String(r.title || ""), summary:String(r.summary || ""), parties:r.parties || {}, figures:r.figures || {}, treatment:r.treatment || {}, findings:f, checks:Array.isArray(r.checks) ? r.checks.slice(0, 30) : [], confidence:String(r.confidence || ""), verify:Array.isArray(r.verify) ? r.verify.map(String).slice(0, 10) : [] };
+}
+async function runReview(){
+  if (!S.sample) return;
+  revStop = false;
+  $("#runReview").disabled = true; $("#stopReview").classList.remove("hidden");
+  const deep = $("#deep").checked;
+  for (const item of S.queue) {
+    if (revStop) break;
+    if (item.status !== "queued" && item.status !== "error") continue;
+    item.err = ""; item.status = "reading"; renderQueue();
+    let x;
+    try { x = await extract(item.file); item.note = x.note; }
+    catch (e) { item.status = "error"; item.err = e.message || "Couldn't read this file."; renderQueue(); continue; }
+    item.status = "running"; renderQueue();
+    revCtl = new AbortController();
+    try {
+      const opts = { signal:revCtl.signal, modelTier: deep ? "complex" : "default" };
+      if (x.images.length) opts.images = x.images.slice(0, S.imgMax || 1);
+      const r = await S.sample.json(reviewPrompt(item, x), opts);
+      const rec = { id:newId("rev"), clientId:S.active, kind:"review", fileName:item.name, createdAt:new Date().toISOString(), note:x.note || "", ...normReview(r || {}) };
+      await store.put("reviews", rec); S.reviews.unshift(rec);
+      item.status = "done"; renderLedger(); renderPick();
+    } catch (e) {
+      item.status = e.code === "cancelled" ? "queued" : "error"; item.err = e.code === "cancelled" ? "" : errText(e);
+      if (e.code === "rate_limited" || e.code === "not_granted" || e.code === "sampling_disabled") { renderQueue(); break; }
+    }
+    renderQueue();
+  }
+  $("#runReview").disabled = false; $("#stopReview").classList.add("hidden");
+  const n = S.queue.filter(q => q.status === "done").length; if (n) toast(`${n} document${n > 1 ? "s" : ""} reviewed`);
+}
+$("#runReview").onclick = runReview;
+$("#stopReview").onclick = () => { revStop = true; revCtl?.abort(); };
+const clientReviews = () => S.reviews.filter(r => (r.clientId || "") === S.active);
+function sevCounts(r){ const c = {high:0, medium:0, low:0}; (r.findings || []).forEach(f => { if (c[f.severity] !== undefined) c[f.severity]++; }); return c; }
+function renderLedger(){
+  const sf = $("#sevFilter").value;
+  const list = clientReviews().filter(r => !sf || (r.findings || []).some(f => sf === "high" ? f.severity === "high" : f.severity === "high" || f.severity === "medium"));
+  const c = activeClient();
+  $("#ledgerSub").textContent = `${c ? c.name : "General (no client)"} — ${clientReviews().length} item${clientReviews().length === 1 ? "" : "s"}`;
+  if (!list.length) { $("#ledger").innerHTML = `<div class="empty"><strong>${sf ? "No items at this severity" : "Nothing reviewed yet"}</strong>${sf ? "Change the filter to see everything." : "Upload documents above, or save an answer from Ask to the client file."}</div>`; return; }
+  $("#ledger").innerHTML = list.map(r => {
+    const n = sevCounts(r), fg = r.figures || {}, p = r.parties || {}, t = r.treatment || {};
+    const sevs = r.kind === "advice" ? `<span class="sev info">Advice</span>` : ["high","medium","low"].filter(k => n[k]).map(k => `<span class="sev ${k}">${n[k]} ${k}</span>`).join("") || `<span class="sev info">No issues</span>`;
+    return `<div class="rev" data-id="${r.id}">
+      <div class="rev-head" role="button" tabindex="0" aria-expanded="false"><div><h4>${esc(r.title || r.fileName)}</h4><div class="rev-meta">${r.signedBy ? `<span class="signed">Signed off by ${esc(r.signedBy)}, ${new Date(r.signedAt).toLocaleDateString("en-GB")}</span> — ` : ""}${esc(r.fileName)} — ${new Date(r.createdAt).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}${t.classification ? " — " + esc(String(t.classification).replace(/_/g," ")) : ""}</div></div><div class="sevs">${sevs}</div></div>
+      <div class="rev-body">
+        ${r.kind === "advice" ? `<div class="md">${md(r.summary)}</div>` : `
+        <p style="margin:0 0 8px;max-width:76ch">${inline(r.summary)}</p>
+        <div class="kv">${[["Supplier",p.supplier],["Supplier TRN",p.supplier_trn],["Recipient",p.recipient],["Date",fg.document_date],["Net",fg.net != null ? (fg.currency || "") + " " + Number(fg.net).toLocaleString() : ""],["VAT",fg.vat != null ? (fg.currency || "") + " " + Number(fg.vat).toLocaleString() : ""]].filter(k => k[1]).map(k => `<div><span>${k[0]}</span>${esc(k[1])}</div>`).join("")}</div>
+        ${t.rationale ? `<p style="font-size:14px;max-width:76ch"><strong>Treatment:</strong> ${inline(t.rationale)} ${(t.refs || []).map(x => inline(x)).join(" ")}</p>` : ""}
+        ${(r.findings || []).map(f => `<div class="finding"><div class="bar ${f.severity}"></div><div><p><strong>${esc(f.issue)}</strong> ${f.ref ? inline(f.ref) : ""}</p>${f.evidence ? `<p class="muted" style="font-size:13.5px">${esc(f.evidence)}</p>` : ""}<p style="font-size:14px">${esc(f.recommendation)}${f.vat_impact_aed != null ? ` <strong>Impact: ${aed(f.vat_impact_aed)}</strong>` : ""}</p></div></div>`).join("")}
+        ${(r.checks || []).length ? `<div class="checks">${r.checks.map(c => `<span class="chk ${esc(c.status)}">${esc(c.check)}: ${esc(c.status)}</span>`).join("")}</div>` : ""}
+        ${(r.verify || []).length ? `<p style="font-size:13.5px" class="muted"><strong>Verify:</strong> ${r.verify.map(esc).join("; ")}</p>` : ""}
+        ${r.note ? `<p class="muted" style="font-size:13px">${esc(r.note)}</p>` : ""}`}
+        <div class="toolbar"><button class="btn small" data-act="ask">Ask about this</button><button class="btn small" data-act="sign">${r.signedBy ? "Remove sign-off" : "Sign off as reviewed"}</button><button class="btn ghost small" data-act="del" style="color:var(--high)">Delete</button></div>
+      </div></div>`;
+  }).join("");
+}
+$("#ledger").addEventListener("click", async e => {
+  const rev = e.target.closest(".rev"); if (!rev) return;
+  const r = S.reviews.find(x => x.id === rev.dataset.id);
+  const act = e.target.closest("[data-act]")?.dataset.act;
+  if (act === "del") { if (!confirm("Delete this item from the client file?")) return; await store.del("reviews", r.id); S.reviews = S.reviews.filter(x => x.id !== r.id); renderLedger(); renderPick(); return; }
+  if (act === "sign") {
+    let who = ""; try { who = localStorage.getItem("vatdesk:reviewer") || ""; } catch {}
+    if (!r.signedBy && !who) { toast("Add your name under Clients first."); return; }
+    if (r.signedBy) { r.signedBy = ""; r.signedAt = ""; } else { r.signedBy = who; r.signedAt = new Date().toISOString(); }
+    await store.put("reviews", r); renderLedger(); toast(r.signedBy ? "Signed off" : "Sign-off removed"); return;
+  }
+  if (act === "ask") { askAbout(`About "${r.title || r.fileName}": ${r.summary.slice(0, 600)}\nKey findings: ${(r.findings || []).slice(0, 5).map(f => f.issue).join("; ")}\n\nMy question: `); return; }
+  if (e.target.closest(".rev-head")) { rev.classList.toggle("open"); e.target.closest(".rev-head").setAttribute("aria-expanded", rev.classList.contains("open")); }
+});
+$("#ledger").addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("rev-head")) { e.preventDefault(); e.target.click(); } });
+$("#sevFilter").onchange = renderLedger;
+</script>
+<script>
+"use strict";
+/* ============ Full legislation database (official texts imported by the user) ============ */
+const LAWCAT = [
+ {id:"vat", code:"FDL", title:"VAT Law — Federal Decree-Law 8/2017 and amendments (consolidated)", note:"Includes FDL 18/2022, 16/2024 and 16/2025", url:"https://tax.gov.ae/Datafolder/Files/Legislation/2025/Federal-Decree-Law-No-8-of-2017-and-amendments.pdf"},
+ {id:"er", code:"ER", title:"VAT Executive Regulation — Cabinet Decision 52/2017 and amendments (consolidated)", note:"Includes CD 100/2024", url:"https://mof.gov.ae/wp-content/uploads/2025/10/Cabinet-Decision-No.-52-of-2017-of-the-Executive-Regulation-of-the-Federal-Decree-Law-No.-8-of-2017-on-Value-Added-Tax-and-its-amendments.pdf"},
+ {id:"tpl", code:"TPL", title:"Tax Procedures Law — Federal Decree-Law 28/2022 and amendments (consolidated)", note:"Use the December 2025 consolidation that includes FDL 17/2025 (check the FTA legislation page)", url:"https://mof.gov.ae/wp-content/uploads/2025/07/Federal-Decree-Law-No.-28-of-2022.pdf"},
+ {id:"tpler", code:"TPL ER", title:"Tax Procedures Executive Regulation — Cabinet Decision 74/2023 and amendments", note:"Consolidated to 1 April 2026", url:"https://tax.gov.ae/Datafolder/Files/Pdf/2026/legislation/Cabinet-Decision-No-74-of-2023-on-Executive-Regulation-of-Tax-Procedures-and-is-amendments-Publishing-01-04-2026.pdf"},
+ {id:"pen", code:"CD 40", title:"Administrative penalties — Cabinet Decision 40/2017 and amendments (consolidated)", note:"Includes CD 49/2021 and CD 129/2025", url:"https://mof.gov.ae/wp-content/uploads/2025/11/Cabinet-Decision-No.-40-of-2017-and-its-amendments.pdf"},
+ {id:"md243", code:"MD 243", title:"E-invoicing system — Ministerial Decision 243/2025", note:"", url:"https://tax.gov.ae/en/legislation/vat.aspx"},
+ {id:"md244", code:"MD 244", title:"E-invoicing implementation — Ministerial Decision 244/2025", note:"Check for later amendments to the ASP deadline", url:"https://tax.gov.ae/en/legislation/vat.aspx"}
+];
+const FTA_GUIDES_URL = "https://tax.gov.ae/en/taxes/vat/guides.references.aspx";
+S.laws = {};
+let libLaw = "", IDX = null;
+const idb = {
+  db:null,
+  async open(){ if (this.db) return this.db; this.db = await new Promise((res, rej) => { const r = indexedDB.open("vatdesk", 1); r.onupgradeneeded = () => r.result.createObjectStore("laws", {keyPath:"id"}); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); return this.db; },
+  async all(){ try { const d = await this.open(); return await new Promise((res, rej) => { const q = d.transaction("laws").objectStore("laws").getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => rej(q.error); }); } catch { return []; } },
+  async put(o){ const d = await this.open(); await new Promise((res, rej) => { const t = d.transaction("laws", "readwrite"); t.objectStore("laws").put(o); t.oncomplete = res; t.onerror = () => rej(t.error); }); },
+  async del(id){ const d = await this.open(); await new Promise((res, rej) => { const t = d.transaction("laws", "readwrite"); t.objectStore("laws").delete(id); t.oncomplete = res; t.onerror = () => rej(t.error); }); }
+};
+async function loadLaws(){
+  S.laws = {};
+  try { const raw = $("#lawpack").textContent.trim(); if (raw) { const p = JSON.parse(raw); (p.laws || []).forEach(l => { S.laws[l.id] = {...l, embedded:true}; }); } } catch (e) { console.warn("law pack", e); }
+  (await idb.all()).forEach(l => { S.laws[l.id] = l; });
+  buildIndex(); updateCoverage();
+}
+function lawCount(){ return Object.values(S.laws).reduce((n, l) => n + l.articles.length, 0); }
+function updateCoverage(){
+  const core = LAWCAT.filter(c => S.laws[c.id]).length;
+  const el = $("#lawCoverage");
+  if (el) el.innerHTML = core ? `Full legislation loaded: ${core} of ${LAWCAT.length} core texts, ${lawCount()} articles — answers quote the official text.` : `Full legislation not loaded yet — answers use the curated summary only. <button class="btn small" id="goLaws">Load legislation</button>`;
+  $("#goLaws")?.addEventListener("click", () => { go("library"); libGroup = "laws"; renderLib(); });
+}
+/* ---- parsing ---- */
+function cleanLawText(t){
+  t = t.replace(/\r/g, "").replace(/[ \t]+/g, " ").replace(/\n--- Page \d+ ---\n/g, "\n");
+  const lines = t.split("\n"), freq = {};
+  lines.forEach(l => { const k = l.trim().replace(/\d+\s*$/, "").trim(); if (k.length > 12) freq[k] = (freq[k] || 0) + 1; });
+  return lines.filter(l => { const k = l.trim().replace(/\d+\s*$/, "").trim(); return !(k.length > 12 && freq[k] > 6); }).join("\n").replace(/\n{3,}/g, "\n\n");
+}
+function splitArticles(text){
+  const t = cleanLawText(text);
+  const re = /(?:^|\n)[ ]*Article[ ]*\(?[ ]*(\d{1,3})[ ]*\)?[ ]*(\(?bis\)?|\(?repeated\)?)?[ ]*([^\n]*)/gi;
+  const heads = []; let m, last = 0;
+  while ((m = re.exec(t))) {
+    const n = +m[1], rest = (m[3] || "").trim(), bis = !!m[2];
+    if (/^(of|and|or|to|in|shall|above|below|from|referred|mentioned|stated|hereof)\b|^[,;]/i.test(rest)) continue;
+    const headingLike = !rest || /^[-–—:]/.test(rest) || (rest.length < 90 && /^[A-Z]/.test(rest) && !/\b(of this|Decree-Law|Clause|Paragraph)\b/.test(rest));
+    if (!(n === last + 1 || (bis && n === last) || (n > last && n <= last + 3) || (n > last && n <= last + 60 && headingLike))) continue;
+    heads.push({ n: bis ? n + " bis" : String(n), idx: m.index + (m[0][0] === "\n" ? 1 : 0), title: rest.replace(/^[-–—:.\s]+/, "") });
+    last = n;
+  }
+  if (heads.length < 3) return null;
+  const arts = [];
+  if (heads[0].idx > 200) arts.push({ n:"0", title:"Preamble and recitals", text:t.slice(0, heads[0].idx).trim() });
+  heads.forEach((h, i) => {
+    const body = t.slice(h.idx, i + 1 < heads.length ? heads[i + 1].idx : undefined).trim();
+    let title = h.title;
+    if (!title) { const nl = body.split("\n").slice(1).map(s => s.trim()).find(Boolean) || ""; if (nl.length < 110 && !/[.;:]$/.test(nl)) title = nl; }
+    arts.push({ n:h.n, title:title.slice(0, 140), text:body });
+  });
+  return arts;
+}
+function chunkText(text){
+  const t = cleanLawText(text), parts = []; let buf = "";
+  t.split(/\n\n+/).forEach(p => { if ((buf + p).length > 3500 && buf) { parts.push(buf); buf = ""; } buf += (buf ? "\n\n" : "") + p; });
+  if (buf) parts.push(buf);
+  return parts.map((p, i) => ({ n:`Part ${i + 1}`, title:(p.split("\n").find(s => s.trim()) || "").slice(0, 100), text:p }));
+}
+/* ---- search index (BM25) ---- */
+const STOP = new Set("the and for with that this which any its shall may not under such where than other into each are from been have has was were will would their there these those all also only upon such said per being".split(" "));
+const tok = s => (String(s).toLowerCase().match(/[a-z0-9]+/g) || []).filter(w => w.length > 2 && !STOP.has(w));
+function buildIndex(){
+  const docs = [];
+  for (const law of Object.values(S.laws)) for (const a of law.articles) { const tf = {}; const ts = tok(a.title + " " + a.title + " " + a.text); ts.forEach(w => tf[w] = (tf[w] || 0) + 1); docs.push({law, a, tf, len:ts.length}); }
+  const df = {}; docs.forEach(d => Object.keys(d.tf).forEach(w => df[w] = (df[w] || 0) + 1));
+  IDX = { docs, df, N:docs.length, avg: docs.reduce((s, d) => s + d.len, 0) / (docs.length || 1) };
+}
+function lawByCode(code){ return Object.values(S.laws).find(l => l.code.toUpperCase() === String(code).toUpperCase()); }
+function findArticle(law, n){ return law?.articles.find(a => a.n === String(n)) || law?.articles.find(a => a.n.replace(/\s+/g, "") === String(n).replace(/\s+/g, "")); }
+function search(query, k){
+  if (!IDX || !IDX.N) return [];
+  const q = [...new Set(tok(query))]; if (!q.length) return [];
+  const scored = IDX.docs.map(d => { let s = 0; for (const w of q) { const f = d.tf[w]; if (!f) continue; const idf = Math.log(1 + (IDX.N - IDX.df[w] + 0.5) / (IDX.df[w] + 0.5)); s += idf * (f * 2.2) / (f + 1.2 * (0.25 + 0.75 * d.len / IDX.avg)); } return {d, s}; }).filter(x => x.s > 0);
+  scored.sort((a, b) => b.s - a.s);
+  const floor = scored.length ? scored[0].s * 0.2 : 0;
+  return scored.filter(x => x.s >= floor).slice(0, k).map(x => x.d);
+}
+function retrieve(query, k = 10, budget = 30000){
+  if (!IDX || !IDX.N) return [];
+  const out = [], seen = new Set(), add = (law, a) => { const key = law.id + "|" + a.n; if (!seen.has(key) && a) { seen.add(key); out.push({law, a}); } };
+  const re = /\b(TPL ER|FDL|ER|TPL)?\s*Art(?:icle)?\.?\s*\(?(\d{1,3})\)?(\s*bis)?/gi; let m;
+  while ((m = re.exec(query))) { const law = lawByCode(m[1] || "FDL"); const a = findArticle(law, m[2] + (m[3] ? " bis" : "")); if (a) add(law, a); }
+  search(query, k + 4).forEach(d => add(d.law, d.a));
+  let used = 0; const res = [];
+  for (const x of out) { if (res.length >= k) break; const len = Math.min(x.a.text.length, 5000); if (used + len > budget && res.length) break; used += len; res.push(x); }
+  return res;
+}
+const artLabel = (law, a) => /^Part /.test(a.n) || a.n === "0" ? `${law.code} — ${a.n === "0" ? "Preamble" : a.n}` : `${law.code} Art ${a.n}`;
+function formatExtracts(hits){
+  if (!hits.length) return "";
+  return "OFFICIAL LEGISLATION EXTRACTS (consolidated English texts imported from official sources; unofficial translations — the Arabic text prevails):\n\n" +
+    hits.map(({law, a}) => `[${artLabel(law, a)}${a.title ? " — " + a.title : ""}] (source: ${law.title})\n${a.text.length > 5000 ? a.text.slice(0, 5000) + "\n[…article continues]" : a.text}`).join("\n\n");
+}
+const GROUND_RULES = `OFFICIAL TEXT RULES: When OFFICIAL LEGISLATION EXTRACTS are provided, they override the knowledge-base summary. Base each conclusion on them, quote the exact operative words in short quotation marks next to the citation, use the article numbers exactly as they appear in the extracts, and say plainly when the extracts do not cover a point (then rely on your expertise and flag it under Verify).`;
+function groundedChips(hits){
+  if (!hits.length) return "";
+  return `<div class="grounded"><span class="muted">Grounded in:</span> ${hits.map(({law, a}) => `<button class="cite" data-law="${law.id}" data-n="${esc(a.n)}">${esc(artLabel(law, a))}</button>`).join(" ")}</div>`;
+}
+/* ---- article viewer ---- */
+let viewing = null;
+function openArticle(lawId, n){
+  const law = S.laws[lawId], a = findArticle(law, n); if (!a) return false;
+  viewing = {law, idx: law.articles.indexOf(a)};
+  $("#artTitle").textContent = artLabel(law, a) + (a.title ? " — " + a.title : "");
+  $("#artSrc").textContent = `${law.title} — imported ${new Date(law.importedAt).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})} from ${law.source}. Unofficial English translation; the Arabic text prevails.`;
+  $("#artText").textContent = a.text;
+  $("#artPrev").disabled = viewing.idx <= 0; $("#artNext").disabled = viewing.idx >= law.articles.length - 1;
+  if (!$("#artDlg").open) $("#artDlg").showModal();
+  $("#artText").scrollTop = 0;
+  return true;
+}
+$("#artClose").onclick = () => $("#artDlg").close();
+$("#artPrev").onclick = () => { const a = viewing.law.articles[viewing.idx - 1]; if (a) openArticle(viewing.law.id, a.n); };
+$("#artNext").onclick = () => { const a = viewing.law.articles[viewing.idx + 1]; if (a) openArticle(viewing.law.id, a.n); };
+$("#artAsk").onclick = () => { const a = viewing.law.articles[viewing.idx]; $("#artDlg").close(); askAbout(`Explain ${artLabel(viewing.law, a)}${a.title ? " (" + a.title + ")" : ""} for a practitioner: what it requires, how it applies in practice, common errors, and any recent amendments.`); };
+$("#artCopy").onclick = async () => { try { await navigator.clipboard.writeText($("#artTitle").textContent + "\n\n" + $("#artText").textContent); toast("Copied"); } catch { toast("Copy isn't available here — select the text instead."); } };
+document.addEventListener("click", e => { const b = e.target.closest(".cite[data-law]"); if (b) { e.stopImmediatePropagation(); openArticle(b.dataset.law, b.dataset.n); } }, true);
+function openLawRef(code){
+  const m = String(code).match(/^(TPL ER|FDL|ER|TPL)\s+Art(?:icle)?\.?\s*(\d{1,3})(\s*bis)?/i);
+  if (!m) return false;
+  const law = lawByCode(m[1]); if (!law) return false;
+  return openArticle(law.id, m[2] + (m[3] ? " bis" : ""));
+}
+/* ---- import / export ---- */
+let importTarget = "vat";
+function openImport(id){
+  importTarget = id || "vat";
+  $("#impLaw").innerHTML = LAWCAT.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join("") + `<option value="other">Other — FTA guide, clarification, decision…</option>`;
+  $("#impLaw").value = importTarget; impToggle(); $("#impStatus").textContent = ""; $("#impFile").value = "";
+  $("#impDlg").showModal();
+}
+function impToggle(){ $("#impOther").classList.toggle("hidden", $("#impLaw").value !== "other"); }
+$("#impLaw").onchange = impToggle;
+$("#impCancel").onclick = () => $("#impDlg").close();
+$("#impForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = $("#impFile").files[0]; if (!f) { $("#impStatus").textContent = "Choose the PDF, Word or text file first."; return; }
+  const sel = $("#impLaw").value;
+  let meta = LAWCAT.find(c => c.id === sel);
+  if (sel === "other") {
+    const code = $("#impCode").value.trim(), title = $("#impTitle").value.trim();
+    if (!code || !title) { $("#impStatus").textContent = "Give the document a short code and a title."; return; }
+    meta = {id: "x_" + code.toLowerCase().replace(/[^a-z0-9]+/g, "_"), code, title};
+  }
+  $("#impGo").disabled = true; $("#impStatus").textContent = "Reading the file…";
+  try {
+    const x = await extract(f, {full:true});
+    const arts = splitArticles(x.text) || chunkText(x.text);
+    const law = {id:meta.id, code:meta.code, title:meta.title, source:f.name, importedAt:new Date().toISOString(), structured: !/^Part /.test(arts[arts.length - 1].n), articles:arts};
+    await idb.put(law); S.laws[law.id] = law; buildIndex(); updateCoverage();
+    $("#impDlg").close(); libLaw = law.id; renderLib();
+    toast(`Imported ${arts.length} ${law.structured ? "articles" : "sections"} from ${f.name}`);
+  } catch (err) { $("#impStatus").textContent = err.message || "Couldn't read this file."; }
+  finally { $("#impGo").disabled = false; }
+});
+async function exportPack(){
+  const laws = Object.values(S.laws).map(({embedded, ...l}) => l);
+  if (!laws.length) { toast("No legislation loaded yet."); return; }
+  await save(`VAT Desk law pack ${today()}.json`, JSON.stringify({format:"vatdesk-lawpack", version:1, exported:new Date().toISOString(), laws}));
+}
+async function loadPack(file){
+  try {
+    const p = JSON.parse(await file.text());
+    if (p.format !== "vatdesk-lawpack" || !Array.isArray(p.laws)) throw new Error("This isn't a VAT Desk law pack.");
+    for (const l of p.laws) { await idb.put(l); S.laws[l.id] = l; }
+    buildIndex(); updateCoverage(); renderLib(); toast(`Loaded ${p.laws.length} texts from the law pack`);
+  } catch (e) { toast(e.message || "Couldn't read the law pack."); }
+}
+async function buildEdition(){
+  const laws = Object.values(S.laws).map(({embedded, ...l}) => l);
+  if (!laws.length) { toast("Import the legislation first, then build the company edition."); return; }
+  const pack = JSON.stringify({format:"vatdesk-lawpack", version:1, exported:new Date().toISOString(), laws}).replace(/<\//g, "<\\/");
+  const html = "<!DOCTYPE html>\n" + PRISTINE.replace(/<script type="application\/json" id="lawpack">[\s\S]*?<\/script>/, `<script type="application/json" id="lawpack">${pack}<\/script>`);
+  await save(`VAT-Desk-company-edition-${today()}.html`, html);
+}
+$("#packFile").onchange = e => { const f = e.target.files[0]; if (f) loadPack(f); e.target.value = ""; };
+function renderLaws(box, q){
+  const core = LAWCAT.filter(c => S.laws[c.id]).length, others = Object.values(S.laws).filter(l => !LAWCAT.find(c => c.id === l.id));
+  if (q) {
+    const hits = search(q, 30);
+    box.innerHTML = `<div class="entry"><h4>Full-text results for “${esc(q)}”</h4><p class="muted">${hits.length ? hits.length + " best-matching articles across " + Object.keys(S.laws).length + " loaded texts." : "No match in the loaded legislation."}</p></div>` +
+      hits.map(d => { const i = d.a.text.toLowerCase().indexOf(tok(q)[0] || "~"); const snip = d.a.text.slice(Math.max(0, i - 120), i + 260).replace(/\s+/g, " "); return `<div class="entry"><button class="cite" data-law="${d.law.id}" data-n="${esc(d.a.n)}">${esc(artLabel(d.law, d.a))}</button> <strong>${esc(d.a.title)}</strong><p class="muted" style="font-size:14px">…${esc(snip)}…</p></div>`; }).join("");
+    return;
+  }
+  if (libLaw && S.laws[libLaw]) {
+    const law = S.laws[libLaw];
+    box.innerHTML = `<div class="entry"><button class="btn ghost small" id="lawBack">← All legislation</button><h4 style="margin-top:8px">${esc(law.title)}</h4><div class="ref">${law.articles.length} ${law.structured === false ? "sections" : "articles"} — imported ${new Date(law.importedAt).toLocaleDateString("en-GB")} from ${esc(law.source)}${law.embedded ? " (company edition)" : ""}</div></div>
+      <div class="art-list">${law.articles.map(a => `<button class="art-item" data-law="${law.id}" data-n="${esc(a.n)}"><span>${esc(/^Part /.test(a.n) || a.n === "0" ? a.n === "0" ? "Preamble" : a.n : "Art " + a.n)}</span>${esc(a.title || "")}</button>`).join("")}</div>`;
+    $("#lawBack").onclick = () => { libLaw = ""; renderLib(); };
+    $$(".art-item", box).forEach(b => b.onclick = () => openArticle(b.dataset.law, b.dataset.n));
+    return;
+  }
+  const row = (c, l) => `<div class="law-row"><div><strong>${esc(c.title)}</strong><div class="muted" style="font-size:13px">${l ? `<span class="tag new" style="margin:0">Loaded</span> ${l.articles.length} ${l.structured === false ? "sections" : "articles"} — ${esc(l.source)}, ${new Date(l.importedAt).toLocaleDateString("en-GB")}` : `<span class="tag verify" style="margin:0">Not loaded</span> ${esc(c.note || "")}`}</div></div>
+    <div class="law-acts">${c.url ? `<a class="btn small" href="${c.url}" target="_blank" rel="noopener">Official source</a>` : ""}<button class="btn small" data-imp="${c.id}">${l ? "Replace" : "Import"}</button>${l ? `<button class="btn small" data-browse="${c.id}">Browse</button>${l.embedded ? "" : `<button class="btn ghost small" data-rmlaw="${c.id}" aria-label="Remove ${esc(c.title)}">✕</button>`}` : ""}</div></div>`;
+  box.innerHTML = `<div class="entry"><h4>Full legislation</h4><p>${core} of ${LAWCAT.length} core texts loaded — ${lawCount()} articles searchable. Ask, Review and Reports quote these texts directly.</p>
+      <ol style="font-size:14px;max-width:72ch;margin:6px 0 10px;padding-left:20px"><li>Open each <strong>Official source</strong> link and download the PDF (FTA or Ministry of Finance).</li><li>Choose <strong>Import</strong> and pick that PDF. VAT Desk splits it article by article.</li><li>When everything is loaded, choose <strong>Build company edition</strong> to get one HTML file with the legislation inside, ready to share.</li></ol>
+      <div class="notice" style="font-size:13.5px">Consolidated English texts are unofficial translations — the Arabic text prevails. Re-import whenever the FTA publishes a new consolidation, then rebuild the company edition.</div>
+      <div class="acts"><button class="btn small primary" data-imp="other">Import a file</button><button class="btn small" id="packExp">Export law pack</button><button class="btn small" id="packImp">Load law pack</button><button class="btn small" id="buildEd">Build company edition</button><a class="btn small" href="${FTA_GUIDES_URL}" target="_blank" rel="noopener">FTA guides & clarifications</a></div></div>
+    ${LAWCAT.map(c => row(c, S.laws[c.id])).join("")}
+    ${others.map(l => row({id:l.id, title:l.title + " (" + l.code + ")", note:"", url:""}, l)).join("")}`;
+  $("#packExp").onclick = exportPack; $("#packImp").onclick = () => $("#packFile").click(); $("#buildEd").onclick = buildEdition;
+  $$("[data-imp]", box).forEach(b => b.onclick = () => openImport(b.dataset.imp));
+  $$("[data-browse]", box).forEach(b => b.onclick = () => { libLaw = b.dataset.browse; renderLib(); });
+  $$("[data-rmlaw]", box).forEach(b => b.onclick = async () => { if (!confirm("Remove this text from the database?")) return; await idb.del(b.dataset.rmlaw); delete S.laws[b.dataset.rmlaw]; buildIndex(); updateCoverage(); renderLib(); });
+}
+</script>
+
+<script>
+"use strict";
+/* ============ Reports ============ */
+const REP_LABEL = {findings:"VAT review findings report", memo:"VAT advisory memo", health:"VAT health check", return:"VAT return review"};
+function renderPick(){
+  const list = clientReviews();
+  $("#repPick").innerHTML = list.length ? list.map(r => `<label><input type="checkbox" value="${r.id}" checked><span>${esc(r.title || r.fileName)}<br><span class="muted" style="font-size:12px">${r.kind === "advice" ? "Saved advice" : esc(r.fileName)}</span></span></label>`).join("") : `<div class="muted" style="padding:12px;font-size:13.5px">No reviewed documents for this client yet.</div>`;
+}
+let repCtl = null;
+function compact(r){
+  if (r.kind === "advice") return `ADVICE — Q: ${r.title}\nA: ${r.summary.slice(0, 3500)}`;
+  return `DOCUMENT — ${r.fileName} (${r.docType}): ${r.title}\nSummary: ${r.summary}\nTreatment: ${r.treatment?.classification || ""} — ${r.treatment?.rationale || ""}\nFindings:\n${(r.findings || []).map(f => `- [${f.severity}] ${f.issue} | ref ${f.ref} | ${f.recommendation} | impact ${f.vat_impact_aed ?? "n/q"}`).join("\n")}\nVerify: ${(r.verify || []).join("; ")}`;
+}
+async function genReport(){
+  if (!S.sample) return;
+  const ids = $$("#repPick input:checked").map(i => i.value);
+  const items = S.reviews.filter(r => ids.includes(r.id));
+  const type = $("#repType").value;
+  if (!items.length && type !== "memo") { toast("Pick at least one reviewed document."); return; }
+  const c = activeClient();
+  let body = items.map(compact).join("\n\n");
+  if (body.length > 150000) body = body.slice(0, 150000) + "\n[...truncated]";
+  const prompt = `You are a senior UAE VAT advisor writing a formal client deliverable in English (${REP_LABEL[type]}).
+${GROUND_RULES}
+${KB}
+
+${formatExtracts(retrieve(body.slice(0, 6000) + " " + $("#repFocus").value, 10, 25000))}
+
+${clientContext()}
+Period / scope: ${$("#repPeriod").value || "not stated"}
+Emphasis requested: ${$("#repFocus").value || "none"}
+Report date: ${today()}
+
+SOURCE MATERIAL (reviews and saved advice):
+${body || "(none — write the memo from the emphasis and client context)"}
+
+Write the report. Reply with ONLY one JSON object:
+{"title":"","subtitle":"","overall_risk":"Low|Moderate|High|Critical",
+ "executive_summary":"3-5 short paragraphs separated by \\n\\n",
+ "key_metrics":[{"label":"","value":""}],
+ "sections":[{"heading":"","body":"paragraphs separated by \\n\\n; bullets as lines starting with '- '"}],
+ "recommendations":[{"priority":"High|Medium|Low","action":"","owner":"","timing":""}],
+ "verify":["items to confirm"],
+ "limitations":"one paragraph on scope and reliance"}
+Rules: be specific to the source material, quantify AED exposure where known, cite authority in short form (e.g. "FDL Art 55", "ER Art 53", "CD 129/2025"), never invent facts, 3-7 sections, up to 10 recommendations.`;
+  $("#genReport").disabled = true; $("#stopReport").classList.remove("hidden");
+  $$("#exportBar button").forEach(b => b.disabled = true);
+  $("#paper").innerHTML = `<div class="empty"><strong>Writing the report…</strong>This usually takes under a minute.</div>`;
+  repCtl = new AbortController();
+  try {
+    const r = await S.sample.json(prompt, { signal:repCtl.signal, modelTier:"complex", cache:false });
+    S.report = { ...r, type, period:$("#repPeriod").value, client:c ? {...c} : null, date:today(), items };
+    renderPaper();
+    $$("#exportBar button").forEach(b => b.disabled = false);
+  } catch (e) {
+    $("#paper").innerHTML = `<div class="empty"><strong>Report not generated</strong>${esc(errText(e))}</div>`;
+  } finally { $("#genReport").disabled = false; $("#stopReport").classList.add("hidden"); }
+}
+function allFindings(items){
+  const rows = [];
+  items.filter(r => r.kind !== "advice").forEach(r => (r.findings || []).forEach(f => rows.push({doc:r.fileName, ...f})));
+  return rows.sort((a,b) => SEV_ORDER[a.severity] - SEV_ORDER[b.severity]);
+}
+function renderPaper(){
+  const R = S.report, c = R.client, F = allFindings(R.items);
+  const paras = s => String(s || "").split(/\n\n+/).map(p => md(p)).join("");
+  $("#paper").innerHTML = `<h1>${esc(R.title || REP_LABEL[R.type])}</h1>
+    <div class="meta">${esc(R.subtitle || "")}${R.subtitle ? "<br>" : ""}${c ? esc(c.name) + (c.trn ? " — TRN " + esc(c.trn) : "") + "<br>" : ""}${R.period ? "Period: " + esc(R.period) + " — " : ""}Report date: ${esc(R.date)}${R.overall_risk ? " — Overall risk: <strong>" + esc(R.overall_risk) + "</strong>" : ""}</div>
+    <h2>Executive summary</h2><div class="md">${paras(R.executive_summary)}</div>
+    ${(R.key_metrics || []).length ? `<div class="kv" style="margin:14px 0">${R.key_metrics.map(m => `<div><span>${esc(m.label)}</span><strong>${esc(m.value)}</strong></div>`).join("")}</div>` : ""}
+    ${(R.sections || []).map(s => `<h2>${esc(s.heading)}</h2><div class="md">${paras(s.body)}</div>`).join("")}
+    ${F.length ? `<h2>Findings register</h2><div class="scroll-x"><table><thead><tr><th>Document</th><th>Severity</th><th>Issue</th><th>Authority</th><th>Recommendation</th><th>VAT impact</th></tr></thead><tbody>${F.map(f => `<tr><td>${esc(f.doc)}</td><td><span class="sev ${f.severity}">${f.severity}</span></td><td>${esc(f.issue)}</td><td>${f.ref ? inline(f.ref) : ""}</td><td>${esc(f.recommendation)}</td><td>${f.vat_impact_aed != null ? aed(f.vat_impact_aed) : "—"}</td></tr>`).join("")}</tbody></table></div>` : ""}
+    ${(R.recommendations || []).length ? `<h2>Recommendations</h2><div class="scroll-x"><table><thead><tr><th>Priority</th><th>Action</th><th>Owner</th><th>Timing</th></tr></thead><tbody>${R.recommendations.map(x => `<tr><td>${esc(x.priority)}</td><td>${inline(x.action)}</td><td>${esc(x.owner)}</td><td>${esc(x.timing)}</td></tr>`).join("")}</tbody></table></div>` : ""}
+    ${(R.verify || []).length ? `<h2>Points to verify</h2><ul>${R.verify.map(v => `<li>${inline(v)}</li>`).join("")}</ul>` : ""}
+    <h2>Scope and limitations</h2><p style="font-size:13.5px">${esc(R.limitations || "")} This report was prepared with the assistance of VAT Desk and should be reviewed by a qualified adviser before it is relied on.</p>`;
+}
+$("#genReport").onclick = genReport;
+$("#stopReport").onclick = () => repCtl?.abort();
+
+/* ---- exports ---- */
+function fileBase(){ const R = S.report; return ((R.client?.name || "General") + " - " + (REP_LABEL[R.type]) + " - " + R.date).replace(/[\\/:*?"<>|]+/g, "-"); }
+async function save(filename, data){
+  if (!S.dl) {
+    const blob = data instanceof Blob ? data : new Blob([data]);
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast("Downloaded " + filename.split(".").pop().toUpperCase()); return;
+  }
+  try { await S.dl.save({filename, data}); toast("Saved " + filename.split(".").pop().toUpperCase()); }
+  catch (e) { if (e.code !== "declined") toast(e.code === "rate_limited" ? "A save is already open — finish it first." : "Couldn't save the file."); }
+}
+const flat = s => plain(String(s || "")).replace(/[^\x09\x0A\x0D\x20-\x7E\u00A0-\u00FF\u2013\u2014\u2018\u2019\u201C\u201D\u2022]/g, "");
+async function exportPDF(){
+  await loadScript(LIBS.jspdf); await loadScript(LIBS.autotable);
+  const { jsPDF } = window.jspdf; const R = S.report, c = R.client, F = allFindings(R.items);
+  const doc = new jsPDF({unit:"pt", format:"a4"}); const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), M = 50, CW = W - 2 * M;
+  const teal = [15,107,92]; let y = 0;
+  doc.setFillColor(...teal); doc.rect(0, 0, W, 6, "F");
+  y = 70; doc.setFont("times","bold"); doc.setFontSize(20); doc.setTextColor(23,32,38);
+  doc.splitTextToSize(flat(R.title || REP_LABEL[R.type]), CW).forEach(l => { doc.text(l, M, y); y += 24; });
+  doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(90,104,110);
+  [R.subtitle, c ? c.name + (c.trn ? "  |  TRN " + c.trn : "") : "", (R.period ? "Period: " + R.period + "  |  " : "") + "Report date: " + R.date + (R.overall_risk ? "  |  Overall risk: " + R.overall_risk : "")].filter(Boolean).forEach(l => { doc.splitTextToSize(flat(l), CW).forEach(t => { doc.text(t, M, y); y += 14; }); });
+  y += 6; doc.setDrawColor(211,220,218); doc.line(M, y, W - M, y); y += 20;
+  const ensure = h => { if (y + h > H - 60) { doc.addPage(); y = 60; } };
+  const heading = t => { ensure(40); doc.setFont("times","bold"); doc.setFontSize(13.5); doc.setTextColor(...teal); doc.text(flat(t), M, y); y += 18; doc.setTextColor(23,32,38); };
+  const para = t => { doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(23,32,38);
+    String(t || "").split(/\n+/).forEach(p => { const bullet = /^\s*[-*•]\s+/.test(p); const txt = flat(p.replace(/^\s*[-*•]\s+/, "")); if (!txt.trim()) return;
+      doc.splitTextToSize(txt, CW - (bullet ? 14 : 0)).forEach((l, i) => { ensure(15); if (bullet && i === 0) doc.text("\u2022", M + 2, y); doc.text(l, M + (bullet ? 14 : 0), y); y += 14.5; }); y += 5; }); };
+  heading("Executive summary"); para(R.executive_summary);
+  if ((R.key_metrics || []).length) { doc.autoTable({startY:y, margin:{left:M, right:M}, head:[["Metric","Value"]], body:R.key_metrics.map(m => [flat(m.label), flat(m.value)]), theme:"grid", styles:{fontSize:9.5, cellPadding:5}, headStyles:{fillColor:teal}}); y = doc.lastAutoTable.finalY + 20; }
+  (R.sections || []).forEach(s => { heading(s.heading); para(s.body); });
+  if (F.length) { heading("Findings register"); doc.autoTable({startY:y, margin:{left:M, right:M}, head:[["Document","Severity","Issue","Authority","Recommendation","VAT impact"]], body:F.map(f => [flat(f.doc), f.severity, flat(f.issue), flat(f.ref), flat(f.recommendation), f.vat_impact_aed != null ? aed(f.vat_impact_aed) : "-"]), theme:"grid", styles:{fontSize:8.5, cellPadding:4, valign:"top"}, headStyles:{fillColor:teal}, columnStyles:{0:{cellWidth:78},1:{cellWidth:48},3:{cellWidth:62},5:{cellWidth:62}},
+      didParseCell: d => { if (d.section === "body" && d.column.index === 1) { const col = {high:[180,35,24], medium:[161,92,7], low:[36,95,158]}[d.cell.raw]; if (col) { d.cell.styles.textColor = col; d.cell.styles.fontStyle = "bold"; } } } }); y = doc.lastAutoTable.finalY + 20; }
+  if ((R.recommendations || []).length) { heading("Recommendations"); doc.autoTable({startY:y, margin:{left:M, right:M}, head:[["Priority","Action","Owner","Timing"]], body:R.recommendations.map(x => [flat(x.priority), flat(x.action), flat(x.owner), flat(x.timing)]), theme:"grid", styles:{fontSize:9, cellPadding:4, valign:"top"}, headStyles:{fillColor:teal}, columnStyles:{0:{cellWidth:56},2:{cellWidth:80},3:{cellWidth:80}}}); y = doc.lastAutoTable.finalY + 20; }
+  if ((R.verify || []).length) { heading("Points to verify"); para(R.verify.map(v => "- " + v).join("\n")); }
+  heading("Scope and limitations"); para((R.limitations || "") + " This report was prepared with the assistance of VAT Desk and should be reviewed by a qualified adviser before it is relied on.");
+  const pages = doc.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) { doc.setPage(i); doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(120,130,135); doc.text(flat((c ? c.name + "  |  " : "") + (REP_LABEL[R.type])), M, H - 28); doc.text(`Page ${i} of ${pages}`, W - M, H - 28, {align:"right"}); }
+  await save(fileBase() + ".pdf", doc.output("blob"));
+}
+const xmlEsc = s => String(s ?? "").replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch])).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, "");
+async function exportDOCX(){
+  await loadScript(LIBS.jszip);
+  const R = S.report, c = R.client, F = allFindings(R.items);
+  const run = (t, o = {}) => `<w:r><w:rPr><w:rFonts w:ascii="${o.serif ? "Cambria" : "Calibri"}" w:hAnsi="${o.serif ? "Cambria" : "Calibri"}"/>${o.b ? "<w:b/>" : ""}${o.color ? `<w:color w:val="${o.color}"/>` : ""}<w:sz w:val="${o.sz || 21}"/></w:rPr><w:t xml:space="preserve">${xmlEsc(t)}</w:t></w:r>`;
+  const P = (t, o = {}) => `<w:p><w:pPr><w:spacing w:before="${o.before ?? 0}" w:after="${o.after ?? 120}"/>${o.bullet ? '<w:ind w:left="360" w:hanging="240"/>' : ""}</w:pPr>${o.bullet ? run("\u2022  ", o) : ""}${run(t, o)}</w:p>`;
+  const H = t => P(t, {b:true, serif:true, sz:28, color:"0F6B5C", before:280, after:100});
+  const paras = s => String(s || "").split(/\n+/).filter(x => x.trim()).map(p => /^\s*[-*•]\s+/.test(p) ? P(plain(p.replace(/^\s*[-*•]\s+/, "")), {bullet:true}) : P(plain(p))).join("");
+  const cell = (t, head) => `<w:tc><w:tcPr>${head ? '<w:shd w:val="clear" w:color="auto" w:fill="DCEFEA"/>' : ""}</w:tcPr><w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${run(plain(t), {b:head, sz:18})}</w:p></w:tc>`;
+  const table = (head, rows) => `<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/><w:tblBorders>${["top","left","bottom","right","insideH","insideV"].map(b => `<w:${b} w:val="single" w:sz="4" w:color="C9D3D1"/>`).join("")}</w:tblBorders><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr>
+    <w:tr><w:trPr><w:tblHeader/></w:trPr>${head.map(h => cell(h, true)).join("")}</w:tr>${rows.map(r => `<w:tr>${r.map(x => cell(x)).join("")}</w:tr>`).join("")}</w:tbl>${P("")}`;
+  let b = P(R.title || REP_LABEL[R.type], {b:true, serif:true, sz:40, after:60});
+  if (R.subtitle) b += P(R.subtitle, {color:"4A5A60"});
+  if (c) b += P(c.name + (c.trn ? "  |  TRN " + c.trn : ""), {color:"4A5A60"});
+  b += P((R.period ? "Period: " + R.period + "  |  " : "") + "Report date: " + R.date + (R.overall_risk ? "  |  Overall risk: " + R.overall_risk : ""), {color:"4A5A60", after:240});
+  b += H("Executive summary") + paras(R.executive_summary);
+  if ((R.key_metrics || []).length) b += table(["Metric","Value"], R.key_metrics.map(m => [m.label, m.value]));
+  (R.sections || []).forEach(s => { b += H(s.heading) + paras(s.body); });
+  if (F.length) b += H("Findings register") + table(["Document","Severity","Issue","Authority","Recommendation","VAT impact"], F.map(f => [f.doc, f.severity, f.issue, f.ref, f.recommendation, f.vat_impact_aed != null ? aed(f.vat_impact_aed) : "-"]));
+  if ((R.recommendations || []).length) b += H("Recommendations") + table(["Priority","Action","Owner","Timing"], R.recommendations.map(x => [x.priority, x.action, x.owner, x.timing]));
+  if ((R.verify || []).length) b += H("Points to verify") + R.verify.map(v => P(plain(v), {bullet:true})).join("");
+  b += H("Scope and limitations") + P((R.limitations || "") + " This report was prepared with the assistance of VAT Desk and should be reviewed by a qualified adviser before it is relied on.");
+  const docXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${b}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1200" w:right="1200" w:bottom="1200" w:left="1200" w:header="600" w:footer="600" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const zip = new window.JSZip();
+  zip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`);
+  zip.file("_rels/.rels", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`);
+  zip.file("word/document.xml", docXml);
+  await save(fileBase() + ".docx", await zip.generateAsync({type:"blob"}));
+}
+async function exportXLSX(){
+  await loadScript(LIBS.xlsx);
+  const X = window.XLSX, R = S.report, c = R.client, F = allFindings(R.items);
+  const wb = X.utils.book_new();
+  const sum = [["Report", R.title || REP_LABEL[R.type]], ["Client", c ? c.name : "General"], ["TRN", c?.trn || ""], ["Period", R.period || ""], ["Report date", R.date], ["Overall risk", R.overall_risk || ""], [], ["Executive summary"], ...String(R.executive_summary || "").split(/\n\n+/).map(p => [plain(p)]), [], ["Metric","Value"], ...(R.key_metrics || []).map(m => [m.label, m.value])];
+  const ws1 = X.utils.aoa_to_sheet(sum); ws1["!cols"] = [{wch:22},{wch:110}]; X.utils.book_append_sheet(wb, ws1, "Summary");
+  const ws2 = X.utils.aoa_to_sheet([["Document","Severity","Area","Issue","Evidence","Authority","Recommendation","VAT impact (AED)"], ...F.map(f => [f.doc, f.severity, f.area, f.issue, f.evidence, f.ref, f.recommendation, f.vat_impact_aed])]);
+  ws2["!cols"] = [{wch:28},{wch:10},{wch:18},{wch:50},{wch:40},{wch:16},{wch:50},{wch:16}]; ws2["!autofilter"] = {ref: ws2["!ref"]}; X.utils.book_append_sheet(wb, ws2, "Findings");
+  const docs = R.items.filter(r => r.kind !== "advice");
+  const ws3 = X.utils.aoa_to_sheet([["File","Type","Title","Supplier","Supplier TRN","Recipient","Date","Currency","Net","VAT","Gross","Classification","High","Medium","Low","Confidence","Signed off by","Signed off on"], ...docs.map(r => { const n = sevCounts(r), f = r.figures || {}, p = r.parties || {}; return [r.fileName, r.docType, r.title, p.supplier || "", p.supplier_trn || "", p.recipient || "", f.document_date || "", f.currency || "", f.net ?? "", f.vat ?? "", f.gross ?? "", r.treatment?.classification || "", n.high, n.medium, n.low, r.confidence, r.signedBy || "", r.signedAt ? r.signedAt.slice(0, 10) : ""]; })]);
+  ws3["!cols"] = [{wch:28},{wch:14},{wch:40},{wch:24},{wch:18},{wch:24},{wch:12},{wch:8},{wch:12},{wch:12},{wch:12},{wch:16},{wch:6},{wch:8},{wch:6},{wch:10}]; X.utils.book_append_sheet(wb, ws3, "Documents");
+  const ws4 = X.utils.aoa_to_sheet([["Priority","Action","Owner","Timing"], ...(R.recommendations || []).map(x => [x.priority, plain(x.action), x.owner, x.timing]), [], ["Points to verify"], ...(R.verify || []).map(v => [plain(v)])]);
+  ws4["!cols"] = [{wch:10},{wch:90},{wch:20},{wch:20}]; X.utils.book_append_sheet(wb, ws4, "Actions");
+  await save(fileBase() + ".xlsx", new Uint8Array(X.write(wb, {bookType:"xlsx", type:"array"})));
+}
+$("#exportBar").addEventListener("click", async e => {
+  const b = e.target.closest("[data-exp]"); if (!b || !S.report) return;
+  b.disabled = true;
+  try { await ({pdf:exportPDF, docx:exportDOCX, xlsx:exportXLSX})[b.dataset.exp](); }
+  catch (err) { console.error(err); toast("Export failed: " + (err.message || "unknown error")); }
+  finally { b.disabled = false; }
+});
+
+/* ============ Calculators ============ */
+function calcRE(){
+  const t = $("#reType").value, tx = $("#reTx").value, first = $("#reFirst").value === "yes";
+  $("#reFirstWrap").classList.toggle("hidden", !["res","charity"].includes(t));
+  const R = {
+    res: first ? ["0% — zero-rated", "Full input tax recovery on related costs.", "FDL Art 45(9)", "First supply by sale or lease within 3 years of completion. Keep the completion certificate and first-occupation evidence."] : ["Exempt", "No input tax recovery on related costs; apportion shared costs.", "FDL Art 46", "Later residential sales and leases are exempt. Mixed developers need ER Art 55 apportionment and may be in the Capital Assets Scheme."],
+    serv: ["5% — standard rated", "Full input tax recovery.", "FDL Art 46", "Serviced and hotel apartments with services beyond accommodation are not residential buildings, so the exemption does not apply."],
+    com: ["5% — standard rated", "Full input tax recovery.", "FDL Art 30", `Commercial ${tx === "lease" ? "rent is taxed per invoice or payment period" : "sale is taxed at the date of supply (earliest of transfer, payment or invoice)"}. Place of supply is where the property sits.`],
+    land: ["Exempt", "No input tax recovery on related costs.", "FDL Art 46", "Only land with no completed or partly completed buildings or civil engineering works. Serviced or infrastructure land can be standard rated — check the facts."],
+    charity: first ? ["0% — zero-rated", "Full input tax recovery.", "FDL Art 45", "First supply of a building used solely by a charity, within 3 years of completion."] : ["Check the facts", "Depends on the later use.", "FDL Art 45", "Later supplies follow the building's actual use — treat as residential (exempt) or commercial (5%)."],
+    mixed: ["Split the value", "Recover in proportion to the taxable part.", "FDL Art 45, Art 46", "Apportion consideration on a fair and reasonable basis between commercial (5%) and residential (0% first supply / exempt later) parts."]
+  }[t];
+  $("#reOut").innerHTML = `<div class="big">${R[0]}</div><p style="margin:4px 0">${R[1]} ${inline(R[2])}</p><p class="muted" style="margin:0">${esc(R[3])}</p>`;
+}
+["reType","reTx","reFirst"].forEach(i => $("#" + i).addEventListener("change", calcRE));
+function calcAP(){
+  const a = num($("#apTax").value), b = num($("#apEx").value), r = num($("#apRes").value);
+  if (!(a >= 0) || !(b >= 0) || a + b <= 0) { $("#apOut").innerHTML = `<span class="muted">Enter taxable and exempt supplies to see the recovery rate.</span>`; return; }
+  const ratio = a / (a + b);
+  $("#apOut").innerHTML = `<div class="big">${(ratio * 100).toFixed(2)}% recoverable</div>${r >= 0 ? `<p style="margin:4px 0">Recover ${aed(r * ratio)} — non-recoverable ${aed(r * (1 - ratio))}</p>` : ""}<p class="muted" style="margin:0">Standard method under ${inline("ER Art 55")}. Check rounding rules and the annual adjustment in the first return after year end; a special method needs FTA approval.</p>`;
+}
+["apTax","apEx","apRes"].forEach(i => $("#" + i).addEventListener("input", calcAP));
+function calcCA(){
+  const per = +$("#caKind").value, v = num($("#caVal").value), t = num($("#caTax").value), i = num($("#caInit").value), n = num($("#caNow").value);
+  if (!(t > 0) || !isFinite(i) || !isFinite(n)) { $("#caOut").innerHTML = `<span class="muted">Enter the input tax, the original recovery % and this year's taxable use %.</span>`; return; }
+  const adj = (t / per) * (i - n) / 100;
+  $("#caOut").innerHTML = `${isFinite(v) && v < 5000000 ? `<p style="margin:0 0 6px;color:var(--med)">Value below AED 5,000,000 — the scheme normally doesn't apply.</p>` : ""}<div class="big">${adj > 0 ? "Pay back " + aed(adj) : adj < 0 ? "Recover a further " + aed(-adj) : "No adjustment"}</div><p class="muted" style="margin:4px 0 0">(${aed(t)} ÷ ${per}) × (${i}% − ${n}%) for this year. Repeat for each remaining year of the ${per}-year period.</p>`;
+}
+["caKind","caVal","caTax","caInit","caNow"].forEach(i => $("#" + i).addEventListener("input", calcCA));
+function calcLP(){
+  const a = num($("#lpAmt").value), d = $("#lpDue").value, p = $("#lpPaid").value;
+  if (!(a > 0) || !d || !p) { $("#lpOut").innerHTML = `<span class="muted">Enter the amount and both dates.</span>`; return; }
+  const due = new Date(d + "T00:00:00Z"), paid = new Date(p + "T00:00:00Z");
+  if (paid <= due) { $("#lpOut").innerHTML = `<div class="big">No late payment penalty</div><p class="muted" style="margin:0">Paid on or before the due date.</p>`; return; }
+  const start = new Date(due); start.setUTCDate(start.getUTCDate() + 1);
+  let months = 0; const cur = new Date(start);
+  while (cur <= paid && months < 600) { months++; cur.setUTCMonth(start.getUTCMonth() + months); cur.setUTCDate(start.getUTCDate()); }
+  const pen = a * 0.14 / 12 * months;
+  const old = d < "2026-04-14";
+  $("#lpOut").innerHTML = `<div class="big">${aed(pen)}</div><p style="margin:4px 0">${months} month${months > 1 ? "s" : ""} or part, at 14% a year (${(14/12).toFixed(4)}% a month) on ${aed(a)} — ${inline("CD 129/2025")}</p>${old ? `<p style="margin:4px 0;color:var(--med)">The due date is before 14 April 2026, so the old regime (2% immediately, 4% monthly after one month, capped — CD 49/2021) may apply to the earlier part. Check the transitional rules before advising.</p>` : ""}<p class="muted" style="margin:0">Estimate only — confirm against the official penalty schedule.</p>`;
+}
+["lpAmt","lpDue","lpPaid"].forEach(i => $("#" + i).addEventListener("input", calcLP));
+
+/* ============ Clients ============ */
+function renderClientSel(){
+  $("#clientSel").innerHTML = `<option value="">General (no client)</option>` + S.clients.map(c => `<option value="${c.id}" ${c.id === S.active ? "selected" : ""}>${esc(c.name)}</option>`).join("") + `<option value="__add">+ Add client…</option>`;
+}
+$("#clientSel").onchange = e => {
+  if (e.target.value === "__add") { e.target.value = S.active; openClient(); return; }
+  S.active = e.target.value; try { localStorage.setItem("vatdesk:active", S.active); } catch {}
+  renderLedger(); renderPick(); S.turns = [];
+  toast(activeClient() ? `Working on ${activeClient().name}` : "General workspace");
+};
+function renderClients(){
+  $("#clientList").innerHTML = S.clients.length ? S.clients.map(c => `<div class="client-row"><div><strong>${esc(c.name)}</strong><div class="muted" style="font-size:13px">${esc(c.sector)} — ${esc(c.zone)}</div></div><div class="hide-sm">${c.trn ? "TRN " + esc(c.trn) : '<span class="muted">No TRN</span>'}</div><div class="hide-sm">${S.reviews.filter(r => r.clientId === c.id).length} items</div><div style="display:flex;gap:6px"><button class="btn small" data-open="${c.id}">Open</button><button class="btn ghost small" data-edit="${c.id}">Edit</button></div></div>`).join("") : `<div class="empty"><strong>No clients yet</strong>Add a client so answers and reviews use their sector, zone and supply mix.</div>`;
+}
+$("#clientList").addEventListener("click", e => {
+  const o = e.target.closest("[data-open]"), ed = e.target.closest("[data-edit]");
+  if (o) { $("#clientSel").value = o.dataset.open; $("#clientSel").dispatchEvent(new Event("change")); go("review"); }
+  if (ed) openClient(S.clients.find(c => c.id === ed.dataset.edit));
+});
+let editing = null;
+function openClient(c){
+  editing = c || null;
+  $("#clientDlgTitle").textContent = c ? "Edit client" : "Add client";
+  $("#cName").value = c?.name || ""; $("#cTrn").value = c?.trn || ""; $("#cPeriod").value = c?.period || "Quarterly"; $("#cSector").value = c?.sector || "Real estate development"; $("#cZone").value = c?.zone || "Mainland"; $("#cNotes").value = c?.notes || "";
+  $("#delClient").classList.toggle("hidden", !c);
+  $("#clientDlg").showModal(); $("#cName").focus();
+}
+$("#addClient").onclick = () => openClient();
+$("#cancelClient").onclick = () => $("#clientDlg").close();
+$("#clientForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const name = $("#cName").value.trim(); if (!name) return;
+  const trn = $("#cTrn").value.replace(/\D/g, "");
+  if (trn && trn.length !== 15) { toast("A TRN has 15 digits."); return; }
+  const c = { id: editing?.id || newId("cli"), name, trn, period:$("#cPeriod").value, sector:$("#cSector").value, zone:$("#cZone").value, notes:$("#cNotes").value.trim(), createdAt: editing?.createdAt || new Date().toISOString() };
+  await store.put("clients", c);
+  S.clients = S.clients.filter(x => x.id !== c.id).concat(c).sort((a,b) => a.name.localeCompare(b.name));
+  if (!editing) { S.active = c.id; try { localStorage.setItem("vatdesk:active", c.id); } catch {} }
+  $("#clientDlg").close(); renderClientSel(); renderClients(); renderLedger(); renderPick();
+  toast(editing ? "Client updated" : `Added ${c.name}`);
+});
+$("#delClient").onclick = async () => {
+  if (!editing || !confirm(`Delete ${editing.name}? Reviews saved under this client stay in your workspace but won't show.`)) return;
+  await store.del("clients", editing.id);
+  S.clients = S.clients.filter(x => x.id !== editing.id);
+  if (S.active === editing.id) { S.active = ""; try { localStorage.setItem("vatdesk:active", ""); } catch {} }
+  $("#clientDlg").close(); renderClientSel(); renderClients(); renderLedger(); renderPick();
+};
+
+/* ============ Theme + start ============ */
+$("#themeBtn").onclick = () => {
+  const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = dark ? "light" : "dark"; try { localStorage.setItem("vatdesk:theme", r.dataset.theme); } catch {}
+};
+const PRISTINE = document.documentElement.outerHTML.replace(/<script\b[^>]*\bsrc=[^>]*>\s*<\/script>/gi, "");
+try { const t = localStorage.getItem("vatdesk:theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+renderLib(); calcRE(); calcAP(); calcCA(); calcLP(); renderClientSel(); renderClients(); renderLedger(); renderPick();
+updateCoverage(); loadLaws().then(() => renderLib());
+try { $("#reviewer").value = localStorage.getItem("vatdesk:reviewer") || ""; } catch {}
+$("#reviewer").addEventListener("change", e => { try { localStorage.setItem("vatdesk:reviewer", e.target.value.trim()); } catch {} });
+initRuntime();
+</script>
+</body>
+</html>
